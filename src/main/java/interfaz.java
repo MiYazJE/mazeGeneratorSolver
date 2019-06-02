@@ -5,6 +5,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import laberinto.Maze2d;
@@ -14,18 +15,18 @@ public class interfaz extends Application {
     @Override
     public void start(Stage ventana) throws Exception {
 
-        Maze2d laberinto = new Maze2d();
-        BorderPane panel = new BorderPane(laberinto);
-        Parent root = panel;
-        Scene scene = new Scene(root, 800, 800);
+        Maze2d laberinto = new Maze2d(200, 200);
+        BorderPane pane = new BorderPane(laberinto);
+        Scene scene = new Scene(pane);
         ventana.setScene(scene);
         ventana.setTitle("Laberinto");
-        ventana.setResizable(false);
+        ventana.setResizable(true);
         ventana.show();
         laberinto.requestFocus();
 
-        new Thread(laberinto).start();
-
+        Thread thread = new Thread(laberinto);
+        thread.setDaemon(true);
+        thread.start();
     }
 
     public static void main(String[] args) {

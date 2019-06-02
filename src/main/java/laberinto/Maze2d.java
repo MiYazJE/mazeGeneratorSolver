@@ -3,16 +3,17 @@
  */
 package laberinto;
 
-import javafx.geometry.Pos;
+import javafx.fxml.Initializable;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 
-import java.awt.*;
+import java.net.URL;
+import java.util.ResourceBundle;
 
 
-public class Maze2d extends VBox implements Runnable {
+public class Maze2d extends VBox implements Runnable, Initializable {
 
     private int[][] m = {
         {1,1,1,1,1,1,1,1,1,1,1,1,1},
@@ -26,25 +27,43 @@ public class Maze2d extends VBox implements Runnable {
         {1,0,0,0,0,0,0,0,0,0,1,7,1},
         {1,1,1,1,1,1,1,1,1,1,1,1,1}
     };
-    private Celda[][] laberinto;
+    private Celda[][] laberinto; // Mapa de los cuadrados generados en el laberinto
     private int filas;
     private int columnas;
-    private int f = 1;
-    private int c = 1;
+    private int posF = 1;
+    private int posC = 1;
+    private double sizeCelda;
+    private final int velocidad = 5;
 
     private final int ABIERTO  = 0;
     private final int PARED    = 1;
-    private final int LLEGADA  = 7;
     private final int ACTUAL   = -1;
     private final int VISITADO = 2;
 
     public Maze2d() {
         this.filas    = m.length;
         this.columnas = m[0].length;
-        laberinto = new Celda[filas][columnas];
-        setAlignment(Pos.TOP_CENTER);
-        pintarLaberinto();
 
+        laberinto = new Celda[filas][columnas];
+        pintarLaberinto();
+    }
+
+    public Maze2d(int f, int c) {
+
+        // El algoritmo de creacion de laberintos solo permite numeros impares
+        this.filas = (f %2 == 0) ? f+1 : f;
+        this.columnas = (c %2 == 0) ? c+1 : c;
+
+        this.sizeCelda = 1000 / filas;
+
+        laberinto = new Celda[filas][columnas];
+        GenerarLaberinto gen = new GenerarLaberinto(filas, columnas);
+        this.m = gen.getLaberinto();
+        pintarLaberinto();
+    }
+
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
         this.setOnKeyPressed(key -> {
             if (key.getCode() == KeyCode.UP)    {
                 movArriba();
@@ -59,22 +78,14 @@ public class Maze2d extends VBox implements Runnable {
                 movDerecha();
             }
         });
-
     }
 
-    public Maze2d(int f, int c) {
-        this.filas    = f;
-        this.columnas = c;
-        setAlignment(Pos.TOP_LEFT);
-        pintarLaberinto();
-    }
-
-    public void pintarLaberinto() {
+    private void pintarLaberinto() {
         getChildren().clear();
         for (int i = 0; i < filas; i++) {
             HBox fila = new HBox();
             for (int j = 0; j < columnas; j++) {
-                Celda celda = new Celda(i, j, m[i][j]);
+                Celda celda = new Celda(i, j, m[i][j], sizeCelda);
                 laberinto[i][j] = celda;
                 fila.getChildren().add(celda);
             }
@@ -90,34 +101,34 @@ public class Maze2d extends VBox implements Runnable {
     }
 
     private void movDerecha() {
-        if (esSeguro(f, c+1)) {
-            mover(f, c+1);
+        if (esSeguro(posF, posC +1)) {
+            mover(posF, posC +1);
         }
     }
 
     private void movIzquierda() {
-        if (esSeguro(f, c-1)) {
-            mover(f, c-1);
+        if (esSeguro(posF, posC -1)) {
+            mover(posF, posC -1);
         }
     }
 
     private void movArriba() {
-        if (esSeguro(f-1, c)) {
-            mover(f-1, c);
+        if (esSeguro(posF -1, posC)) {
+            mover(posF -1, posC);
         }
     }
 
     private void movAbajo() {
-        if (esSeguro(f+1, c)) {
-            mover(f+1, c);
+        if (esSeguro(posF +1, posC)) {
+            mover(posF +1, posC);
         }
     }
 
     private void mover(int f, int c) {
-        laberinto[this.f][this.c].cambiarPos(ABIERTO);
+        laberinto[this.posF][this.posC].cambiarPos(ABIERTO);
         laberinto[f][c].cambiarPos(ACTUAL);
-        this.f = f;
-        this.c = c;
+        this.posF = f;
+        this.posC = c;
     }
 
     @Override
@@ -137,12 +148,12 @@ public class Maze2d extends VBox implements Runnable {
             m[i][j] = ACTUAL;
             pintar(i, j, Color.GREEN);
 
-            if (i == 7 && j == 11)
+            if (i == filas-2 && j == columnas-2)
                 return true;
 
             synchronized (this) {
                 try {
-                    wait(200);
+                    wait(velocidad);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -158,7 +169,7 @@ public class Maze2d extends VBox implements Runnable {
             pintar(i, j, Color.BLUE);
             synchronized (this) {
                 try {
-                    wait(200);
+                    wait(velocidad);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }

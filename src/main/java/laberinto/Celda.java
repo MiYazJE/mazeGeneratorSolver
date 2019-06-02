@@ -14,12 +14,11 @@ public class Celda extends Rectangle {
     private final int ACTUAL   = -1;
     private final int VISITADO = 2;
 
-    public Celda(int fila, int columna, int estado) {
-        super(50, 50);
+    public Celda(int fila, int columna, int estado, double size) {
+        super(size, size);
         this.fila = fila;
         this.columna = columna;
         aplicarEstilo(estado);
-        setStroke(Color.BLACK);
     }
 
     public int getFila() {
@@ -39,11 +38,12 @@ public class Celda extends Rectangle {
     }
 
     private void aplicarEstilo(int estado) {
-        if (estado == PARED)    setFill(Color.GRAY);
+        if (estado == PARED)    setFill(Color.BLACK);
         if (estado == ABIERTO)  setFill(Color.WHITE);
         if (estado == LLEGADA)  setFill(Color.RED);
         if (estado == ACTUAL)   setFill(Color.GREEN);
         if (estado == VISITADO) setFill(Color.BLUE);
+        if (!(estado != VISITADO && estado != ACTUAL)) setStroke(Color.BLACK);
     }
 
     public void cambiarPos(int POS) {
