@@ -3,11 +3,21 @@
  */
 package laberinto;
 
+import Celda.Celda;
+
+import java.util.Random;
+import java.util.Stack;
+
 public class GenerarLaberinto {
 
-    int filas;
-    int columnas;
-    int[][] maze;
+    private int filas;
+    private int columnas;
+    private int[][] maze;
+    private Stack<Celda> pila = new Stack<>();
+    private Celda[][] celdas;
+    private Celda actual;
+    private Stack<Celda> vecinos;
+    private Random rnd = new Random();
 
     public GenerarLaberinto(int f, int c) {
         this.filas = f;
@@ -16,7 +26,7 @@ public class GenerarLaberinto {
         crearLaberinto();
     }
 
-    public void crearLaberinto() {
+    private void crearLaberinto() {
 
         int i,j;
         int emptyCt = 0;
@@ -84,6 +94,16 @@ public class GenerarLaberinto {
 
     public int[][] getLaberinto() {
         return this.maze;
+    }
+
+    private void imprimir() {
+        for (int i = 0; i < filas; i++) {
+            for (int j = 0; j < columnas; j++) {
+                System.out.print(maze[i][j] + " ");
+            }
+            System.out.println();
+        }
+        System.out.println();
     }
 
 }

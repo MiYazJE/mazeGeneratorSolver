@@ -15,12 +15,12 @@ public class interfaz extends Application {
     @Override
     public void start(Stage ventana) throws Exception {
 
-        Maze2d laberinto = new Maze2d(200, 200);
+        Maze2d laberinto = new Maze2d(100);
         BorderPane pane = new BorderPane(laberinto);
         Scene scene = new Scene(pane);
         ventana.setScene(scene);
         ventana.setTitle("Laberinto");
-        ventana.setResizable(true);
+        ventana.setResizable(false);
         ventana.show();
         laberinto.requestFocus();
 
