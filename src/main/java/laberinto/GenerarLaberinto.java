@@ -3,12 +3,12 @@
  */
 package laberinto;
 
-import Celda.Celda;
+import Celda.*;
 
 import java.util.Random;
 import java.util.Stack;
 
-public class GenerarLaberinto {
+public class GenerarLaberinto implements EstadoCeldas {
 
     private int filas;
     private int columnas;
@@ -37,7 +37,7 @@ public class GenerarLaberinto {
 
         for (i = 0; i<filas; i++)
             for (j = 0; j < columnas; j++)
-                maze[i][j] = 1;
+                maze[i][j] = PARED;
 
         for (i = 1; i<filas-1; i += 2)  {
             for (j = 1; j<columnas-1; j += 2) {
@@ -64,21 +64,21 @@ public class GenerarLaberinto {
             wallcol[r] = wallcol[i];
         }
 
-        // Reemplazar valores negativos por casillas vacias(0)
+        // Reemplazar valores negativos por casillas abiertas
         for (i=1; i<filas-1; i++)
             for (j=1; j<columnas-1; j++)
                 if (maze[i][j] < 0)
-                    maze[i][j] = 0;
+                    maze[i][j] = ABIERTO;
     }
 
-    void tearDown(int row, int col) {
-        if (row % 2 == 1 && maze[row][col-1] != maze[row][col+1]) {
-            fill(row, col-1, maze[row][col-1], maze[row][col+1]);
-            maze[row][col] = maze[row][col+1];
+    private void tearDown(int fila, int col) {
+        if (fila % 2 != 0 && maze[fila][col-1] != maze[fila][col+1]) {
+            fill(fila, col-1, maze[fila][col-1], maze[fila][col+1]);
+            maze[fila][col] = maze[fila][col+1];
         }
-        else if (row % 2 == 0 && maze[row-1][col] != maze[row+1][col]) {
-            fill(row-1, col, maze[row-1][col], maze[row+1][col]);
-            maze[row][col] = maze[row+1][col];
+        else if (fila % 2 == 0 && maze[fila-1][col] != maze[fila+1][col]) {
+            fill(fila-1, col, maze[fila-1][col], maze[fila+1][col]);
+            maze[fila][col] = maze[fila+1][col];
         }
     }
 

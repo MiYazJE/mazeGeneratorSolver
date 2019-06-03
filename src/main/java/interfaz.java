@@ -15,8 +15,9 @@ public class interfaz extends Application {
     @Override
     public void start(Stage ventana) throws Exception {
 
-        Maze2d laberinto = new Maze2d(100);
-        BorderPane pane = new BorderPane(laberinto);
+        Maze2d laberinto = new Maze2d(10);
+        BorderPane pane = new BorderPane();
+        pane.setCenter(laberinto);
         Scene scene = new Scene(pane);
         ventana.setScene(scene);
         ventana.setTitle("Laberinto");
@@ -24,9 +25,9 @@ public class interfaz extends Application {
         ventana.show();
         laberinto.requestFocus();
 
-        Thread thread = new Thread(laberinto);
-        thread.setDaemon(true);
-        thread.start();
+        //Thread thread = new Thread(laberinto);
+        //thread.setDaemon(true);
+        //thread.start();
     }
 
     public static void main(String[] args) {

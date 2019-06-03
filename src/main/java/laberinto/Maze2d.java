@@ -3,46 +3,29 @@
  */
 package laberinto;
 
-import Celda.Celda;
-import Generador.MakeMazeDfs;
-import javafx.fxml.Initializable;
+import Celda.*;
+import Jugador.Player;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.stage.Stage;
 
-import java.net.URL;
-import java.util.ResourceBundle;
 import java.util.Stack;
 
+enum direcciones {
+    ARRIBA, ABAJO, DERECHA, IZQUIERDA
+}
 
-public class Maze2d extends VBox implements Runnable, Initializable {
+public class Maze2d extends VBox implements Runnable, EstadoCeldas {
 
-    private int[][] m = {
-        {1,1,1,1,1,1,1,1,1,1,1,1,1},
-        {1,-1,1,0,1,0,1,0,0,0,0,0,1},
-        {1,0,1,0,0,0,1,0,1,1,1,0,1},
-        {1,0,0,0,1,1,1,0,0,0,0,0,1},
-        {1,0,1,0,0,0,0,0,1,1,1,0,1},
-        {1,0,1,0,1,1,1,0,1,0,0,0,1},
-        {1,0,1,0,1,0,0,0,1,1,1,0,1},
-        {1,0,1,0,1,1,1,0,1,0,1,0,1},
-        {1,0,0,0,0,0,0,0,0,0,1,7,1},
-        {1,1,1,1,1,1,1,1,1,1,1,1,1}
-    };
+    private int[][] m;
     private Celda[][] laberinto; // Mapa de los cuadrados generados en el laberinto
     private int dimension;
-    private int posF = 1;
-    private int posC = 1;
     private double sizeCelda;
-    private final int velocidad = 10;
     private Stack<String> ruta = new Stack<>();
-
-    public final int ACTUAL   = -1;
-    public final int PARED    = 0;
-    public final int ABIERTO  = 1;
-    public final int VISITADO = 2;
-    public final int LLEGADA  = 7;
+    private final int velocidad = 50;
+    Player player;
 
     public Maze2d() {
         laberinto = new Celda[dimension][dimension];
@@ -51,35 +34,88 @@ public class Maze2d extends VBox implements Runnable, Initializable {
 
     public Maze2d(int dim) {
 
-        // El algoritmo de creacion de laberintos solo permite numeros impares
+        this.player = new Player();
+        crearEventosMovimiento();
+
+        // El algoritmo de creacion de laberintos solo permite dimensiones impares
         this.dimension = (dim %2 == 0) ? dim+1 : dim;
         this.sizeCelda = 1000 / dimension;
 
         laberinto = new Celda[dimension][dimension];
-        //GenerarLaberinto gen = new GenerarLaberinto(filas, columnas);
-        //this.m = gen.getLaberinto();
+        GenerarLaberinto gen = new GenerarLaberinto(dimension, dimension);
+        this.m = gen.getLaberinto();
 
-        MakeMazeDfs make = new MakeMazeDfs(dimension);
-        this.m = make.getLaberinto();
+        //MakeMazeDfs make = new MakeMazeDfs(dimension);
+        //this.m = make.getLaberinto();
         pintarLaberinto();
     }
 
-    @Override
-    public void initialize(URL location, ResourceBundle resources) {
+    private void crearEventosMovimiento() {
+
         this.setOnKeyPressed(key -> {
             if (key.getCode() == KeyCode.UP)    {
-                movArriba();
+                moverJugador(direcciones.ARRIBA);
             }
             if (key.getCode() == KeyCode.DOWN)  {
-                movAbajo();
+                moverJugador(direcciones.ABAJO);
             }
             if (key.getCode() == KeyCode.LEFT)  {
-                movIzquierda();
+                moverJugador(direcciones.IZQUIERDA);
             }
             if (key.getCode() == KeyCode.RIGHT) {
-                movDerecha();
+                moverJugador(direcciones.DERECHA);
             }
         });
+
+        this.setOnKeyReleased(e -> {
+            if (player.x == dimension-1 && player.y == dimension-1)
+                System.out.println("VICTORIA");
+        });
+
+    }
+
+    private void pintarCeldaVacio(Celda celda) {
+        celda.pintarCelda(Color.WHITE);
+    }
+
+    private void pintarCeldaActual(Celda celda) {
+        celda.pintarCelda(Color.GREEN);
+    }
+
+    private void moverJugador(direcciones direccion) {
+
+        int f = player.y;
+        int c = player.x;
+
+        switch (direccion) {
+            case ABAJO:
+                if (esSeguro(f+1, c)) {
+                    player.mover(1, 0);
+                    pintarCeldaVacio(laberinto[f][c]);
+                    pintarCeldaActual(laberinto[f+1][c]);
+                }
+                break;
+            case ARRIBA:
+                if (esSeguro(f-1, c)) {
+                    player.mover(-1, 0);
+                    pintarCeldaVacio(laberinto[f][c]);
+                    pintarCeldaActual(laberinto[f-1][c]);
+                }
+                break;
+            case DERECHA:
+                if (esSeguro(f, c+1)) {
+                    player.mover(0, 1);
+                    pintarCeldaVacio(laberinto[f][c]);
+                    pintarCeldaActual(laberinto[f][c+1]);
+                }
+                break;
+            case IZQUIERDA:
+                if (esSeguro(f, c-1)) {
+                    player.mover(0, -1);
+                    pintarCeldaVacio(laberinto[f][c]);
+                    pintarCeldaActual(laberinto[f][c-1]);
+                }
+        }
     }
 
     private void pintarLaberinto() {
@@ -98,38 +134,7 @@ public class Maze2d extends VBox implements Runnable, Initializable {
     private boolean esSeguro(int f, int c) {
         return (f >= 0 && f < m.length &&
                 c >= 0 && c < m[0].length &&
-                m[f][c] != 1);
-    }
-
-    private void movDerecha() {
-        if (esSeguro(posF, posC +1)) {
-            mover(posF, posC +1);
-        }
-    }
-
-    private void movIzquierda() {
-        if (esSeguro(posF, posC -1)) {
-            mover(posF, posC -1);
-        }
-    }
-
-    private void movArriba() {
-        if (esSeguro(posF -1, posC)) {
-            mover(posF -1, posC);
-        }
-    }
-
-    private void movAbajo() {
-        if (esSeguro(posF +1, posC)) {
-            mover(posF +1, posC);
-        }
-    }
-
-    private void mover(int f, int c) {
-        laberinto[this.posF][this.posC].cambiarPos(ABIERTO);
-        laberinto[f][c].cambiarPos(ACTUAL);
-        this.posF = f;
-        this.posC = c;
+                m[f][c] != PARED);
     }
 
     @Override
@@ -144,7 +149,7 @@ public class Maze2d extends VBox implements Runnable, Initializable {
 
     private boolean resolver() {
         this.m[1][1] = ABIERTO;
-        return resolver(0, 0);
+        return resolver(1, 1);
     }
 
     private boolean resolver(int i, int j) {
@@ -155,7 +160,7 @@ public class Maze2d extends VBox implements Runnable, Initializable {
             ruta.push( ("["+i+", "+j+"]") );
             pintar(i, j, Color.GREEN);
 
-            if (i == dimension-1 && j == dimension-1)
+            if (i == dimension-2 && j == dimension-2)
                 return true;
 
             synchronized (this) {

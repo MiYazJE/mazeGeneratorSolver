@@ -31,13 +31,6 @@ public class Celda extends Rectangle implements EstadoCeldas {
             setStroke(Color.BLACK);
     }
 
-    public void cambiarPos(int POS) {
-        switch (POS) {
-            case ACTUAL:  this.setFill(Color.GREEN); break;
-            case ABIERTO: this.setFill(Color.WHITE); break;
-        }
-    }
-
     public void pintarCelda(Color color) {
         this.setFill(color);
     }
