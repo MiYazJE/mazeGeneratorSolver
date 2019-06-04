@@ -1,0 +1,13 @@
+/* CSS Styles - Rubén Saiz Serrano*/
+
+.btn-rightPanel {
+    -fx-font-size: 20px;
+    -fx-cursor: HAND;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+.label {
+    -fx-font-size: 12px;
+    -fx-text-fill: white;
+}

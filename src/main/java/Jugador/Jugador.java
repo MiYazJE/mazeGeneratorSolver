@@ -1,14 +1,18 @@
 package Jugador;
 
-public class Player {
+/**
+ * Clase que obtiene las posiciones de un jugador en un laberinto,
+ * puede moverse por el.
+ */
+public class Jugador {
 
     public int x;
     public int y;
 
     /**
-     * Creacion de un jugador
+     * Constructor para la creación de un jugador
      */
-    public Player() {
+    public Jugador() {
         this.x = 1;
         this.y = 1;
     }

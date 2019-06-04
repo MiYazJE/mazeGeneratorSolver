@@ -26,7 +26,7 @@ public class GenerarLaberinto implements EstadoCeldas {
         crearLaberinto();
     }
 
-    private void crearLaberinto() {
+    public void crearLaberinto() {
 
         int i,j;
         int emptyCt = 0;
