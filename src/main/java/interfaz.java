@@ -1,19 +1,17 @@
 import com.jfoenix.controls.JFXButton;
-import com.jfoenix.controls.JFXColorPicker;
 import com.jfoenix.controls.JFXSlider;
+import controladores.VentanaSeleccionColores;
 import javafx.application.Application;
-import javafx.geometry.HPos;
 import javafx.geometry.Insets;
-import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import laberinto.Maze2d;
-import laberinto.Propiedades;
+import utils.Propiedades;
+import utils.Mensaje;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -24,66 +22,63 @@ import java.util.Properties;
 
 public class interfaz extends Application {
 
-    FlowPane contenedorRight;
+    StackPane contenedorGlobal;
+    BorderPane contenedorLeft;
     JFXButton btnCrearLaberinto;
     JFXButton btnEmpezar;
-    JFXButton btnTerminar;
+    JFXButton btnConfiguracion;
     Maze2d laberinto;
     BorderPane pane;
     Thread thread;
     JFXSlider slider;
     Label velocidad;
     Propiedades propiedades;
-    Label tituloColor;
-    JFXColorPicker colorAbierto;
+    VBox cajaComponentes;
 
     @Override
-    public void start(Stage ventana) throws Exception {
+    public void start(Stage ventana) throws IOException {
 
-        propiedades = new Propiedades();
-        propiedades.crearPropiedades();
+        cargarPropiedades();
 
         laberinto = new Maze2d(100);
         pane = new BorderPane();
         pane.setCenter(laberinto);
 
-        contenedorRight = new FlowPane();
-        BackgroundImage imagen = new BackgroundImage(new Image("/imagenes/laberinto.jpg",1920,1000,false,true),
-                BackgroundRepeat.REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT,
-                BackgroundSize.DEFAULT);
-        contenedorRight.setBackground(new Background(imagen));
+        btnConfiguracion = new JFXButton("CONFIGURACIÓN");
+        btnConfiguracion.getStyleClass().add("btn-configuracion");
+
         btnCrearLaberinto = new JFXButton("Crear laberinto");
         btnCrearLaberinto.getStyleClass().add("btn-rightPanel");
+
         btnEmpezar = new JFXButton("Empezar");
         btnEmpezar.getStyleClass().add("btn-rightPanel");
 
-        btnTerminar = new JFXButton("Terminar");
-        btnTerminar.getStyleClass().add("btn-rightPanel");
-
+        VBox cajaSlider = new VBox();
         slider = new JFXSlider();
-        slider.setValue(20);
-        slider.setMin(1);
-        slider.setMax(1000);
+        propiedadesSlider();
+        velocidad = new Label("Velocidad " + slider.getValue());
+        cajaSlider.getChildren().addAll(slider, velocidad);
+        cajaSlider.setAlignment(Pos.TOP_CENTER);
 
-        VBox cajaColor = cargarComponentesEleccionColor();
+        cajaComponentes = new VBox();
+        propiedadesComponentes();
+        cajaComponentes.getChildren().addAll(btnCrearLaberinto, btnEmpezar,
+                cajaSlider);
 
-        contenedorRight.getChildren().addAll(btnCrearLaberinto, btnEmpezar,
-                btnTerminar, velocidad, slider, cajaColor);
-        contenedorRight.setAlignment(Pos.TOP_CENTER);
-        contenedorRight.setOrientation(Orientation.valueOf("VERTICAL"));
-        contenedorRight.setColumnHalignment(HPos.valueOf("CENTER"));
-        contenedorRight.setMinWidth(300);
-        FlowPane.setMargin(btnCrearLaberinto, new Insets(20, 20, 20, 20));
-        FlowPane.setMargin(btnEmpezar, new Insets(20, 20, 20, 20));
-        FlowPane.setMargin(btnTerminar, new Insets(20, 20, 20, 20));
-        FlowPane.setMargin(slider, new Insets(5, 20, 20, 20));
-        FlowPane.setMargin(cajaColor, new Insets(40, 20, 20, 20));
-        pane.setRight(contenedorRight);
+        contenedorLeft = new BorderPane();
+        contenedorLeft.setCenter(cajaComponentes);
+        contenedorLeft.setBottom(btnConfiguracion);
+        BorderPane.setMargin(btnConfiguracion, new Insets(0, 60, 50, 60));
+        propiedadesContenedorLeft();
+        aplicarMargenes();
+
+        pane.setLeft(contenedorLeft);
+        contenedorGlobal = new StackPane(pane);
 
         crearEventos();
 
-        Scene scene = new Scene(pane);
-        scene.getStylesheets().add("/estilos.css");
+        Scene scene = new Scene(contenedorGlobal);
+        scene.getStylesheets().add("estilos.css");
 
         ventana.setScene(scene);
         ventana.setTitle("Laberinto");
@@ -93,6 +88,25 @@ public class interfaz extends Application {
 
         thread = new Thread(laberinto);
 
+    }
+
+    private void cargarPropiedades() {
+        propiedades = new Propiedades();
+        propiedades.crearPropiedades();
+    }
+
+    private void propiedadesContenedorLeft() {
+        contenedorLeft.setMinWidth(300);
+        BackgroundImage imagen = new BackgroundImage(new Image("/imagenes/laberinto.jpg",1920,1000,false,true),
+                BackgroundRepeat.REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT,
+                BackgroundSize.DEFAULT);
+        contenedorLeft.setBackground(new Background(imagen));
+    }
+
+    private void propiedadesComponentes() {
+        cajaComponentes.setAlignment(Pos.TOP_CENTER);
+        cajaComponentes.setSpacing(50);
+        BorderPane.setMargin(cajaComponentes, new Insets(40, 40, 40 ,40));
     }
 
     private void crearEventos() {
@@ -120,24 +134,14 @@ public class interfaz extends Application {
             }
         });
 
-        btnTerminar.setOnAction(e -> this.thread.stop());
+        btnConfiguracion.setOnAction(e -> lanzarVentanaConfiguracion());
 
     }
 
-    private VBox cargarComponentesEleccionColor() {
-
-        VBox cajaColor = new VBox();
-        velocidad = new Label("Velocidad: " + slider.getValue());
-
-        tituloColor = new Label("Selecciona un color");
-        tituloColor.getStyleClass().add("seleccion-color");
-
-        Map<String, String> conf = cargarColores();
-        colorAbierto = new JFXColorPicker(Color.valueOf(conf.get("ABIERTO")));
-
-        cajaColor.getChildren().addAll(new HBox(tituloColor), new HBox(colorAbierto));
-
-        return cajaColor;
+    private void aplicarMargenes() {
+        BorderPane.setMargin(btnCrearLaberinto, new Insets(50, 30, 30, 30));
+        BorderPane.setMargin(slider, new Insets(30, 30, 30, 30));
+        BorderPane.setMargin(btnEmpezar, new Insets(5, 30, 30, 30));
     }
 
     private Map<String, String> cargarColores() {
@@ -147,18 +151,29 @@ public class interfaz extends Application {
         try {
             FileInputStream file = new FileInputStream(new File("propiedades.properties"));
             p.load(file);
-            /*
-PARED=\#000000
-ABIERTO=\#FFFFFF
-LLEGADA=\#FF0000
-VISITADO=\#0027FF
-ACTUAL=\#2AFF00
-             */
             conf.put("ABIERTO", p.getProperty("ABIERTO"));
 
         } catch (IOException e) {}
 
         return conf;
+    }
+
+    private void propiedadesSlider() {
+        slider.setMaxWidth(200);
+        slider.setValue(20);
+        slider.setMin(1);
+        slider.setMax(1000);
+    }
+
+    private void lanzarVentanaConfiguracion() {
+
+        VentanaSeleccionColores ventana = new VentanaSeleccionColores();
+        Mensaje.mostrar(contenedorGlobal, ventana);
+
+        /*Stage stage = new Stage();
+        Scene scene = new Scene(ventana);
+        stage.setScene(scene);
+        stage.show();*/
     }
 
     public static void main(String[] args) {

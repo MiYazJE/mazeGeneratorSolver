@@ -16,3 +16,9 @@
     -fx-text-fill: white;
     -fx-font-size: 17px;
 }
+
+.btn-configuracion {
+    -fx-text-fill: white;
+    -fx-font-size: 15px;
+    -fx-cursor: HAND;
+}

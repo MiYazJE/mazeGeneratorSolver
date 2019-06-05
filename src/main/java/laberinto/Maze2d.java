@@ -4,12 +4,16 @@
 package laberinto;
 
 import Celda.*;
+import Generador.GenerarLaberinto;
 import Jugador.Jugador;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import utils.Propiedades;
 
+import java.util.HashMap;
+import java.util.Properties;
 import java.util.Stack;
 
 public class Maze2d extends VBox implements Runnable, EstadoCeldas {
@@ -27,8 +31,11 @@ public class Maze2d extends VBox implements Runnable, EstadoCeldas {
     private int velocidad;
     private Jugador player;
     private GenerarLaberinto gen;
+    private HashMap<String, String> colores;
 
     public Maze2d(int dim) {
+
+        colores = Propiedades.cargarPropiedades();
 
         this.player = new Jugador();
         crearEventosMovimiento();
@@ -66,6 +73,10 @@ public class Maze2d extends VBox implements Runnable, EstadoCeldas {
             if (player.x == dimension-2 && player.y == dimension-2)
                 System.out.println("VICTORIA");
         });
+
+    }
+
+    private void cargarProperties() {
 
     }
 
@@ -126,7 +137,7 @@ public class Maze2d extends VBox implements Runnable, EstadoCeldas {
         for (int i = 0; i < dimension; i++) {
             HBox fila = new HBox();
             for (int j = 0; j < dimension; j++) {
-                Celda celda = new Celda(i, j, maze[i][j], sizeCelda);
+                Celda celda = new Celda(i, j, maze[i][j], sizeCelda, colores);
                 laberinto[i][j] = celda;
                 fila.getChildren().add(celda);
             }
@@ -157,7 +168,6 @@ public class Maze2d extends VBox implements Runnable, EstadoCeldas {
     @Override
     public void run() {
         resolver(1, 1);
-        //System.out.println(ruta);
         marcarRuta();
     }
 
@@ -171,7 +181,7 @@ public class Maze2d extends VBox implements Runnable, EstadoCeldas {
 
             maze[i][j] = ACTUAL;
             ruta.push( i + " " + j);
-            pintar(i, j, Color.GREEN);
+            pintar(i, j, Color.valueOf(colores.get("ACTUAL")));
 
             if (i == dimension-2 && j == dimension-2)
                 return true;
@@ -190,7 +200,7 @@ public class Maze2d extends VBox implements Runnable, EstadoCeldas {
 
             ruta.pop();
             maze[i][j] = VISITADO;
-            pintar(i, j, Color.BLUE);
+            pintar(i, j, Color.valueOf(colores.get("VISITADO")));
 
             synchronized (this) {
                 try {
@@ -215,7 +225,7 @@ public class Maze2d extends VBox implements Runnable, EstadoCeldas {
             String str = ruta.pop();
             f = Integer.valueOf(str.split(" ")[0]);
             c = Integer.valueOf(str.split(" ")[1]);
-            laberinto[f][c].pintarCelda(Color.RED);
+            laberinto[f][c].pintarCelda(Color.valueOf(colores.get("LLEGADA")));
             if (f == 1 && c == 1) break;
             synchronized (this) {
                 try {

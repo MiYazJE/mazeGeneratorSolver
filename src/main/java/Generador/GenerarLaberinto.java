@@ -1,7 +1,7 @@
 /**
  * @author Ruben Saiz
  */
-package laberinto;
+package Generador;
 
 import Celda.*;
 
