@@ -11,3 +11,8 @@
     -fx-font-size: 12px;
     -fx-text-fill: white;
 }
+
+.seleccion-color {
+    -fx-text-fill: white;
+    -fx-font-size: 17px;
+}

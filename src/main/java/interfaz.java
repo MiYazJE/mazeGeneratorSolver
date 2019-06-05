@@ -1,26 +1,26 @@
 import com.jfoenix.controls.JFXButton;
+import com.jfoenix.controls.JFXColorPicker;
 import com.jfoenix.controls.JFXSlider;
 import javafx.application.Application;
-import javafx.beans.binding.IntegerBinding;
-import javafx.beans.binding.NumberBinding;
-import javafx.fxml.Initializable;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
-import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import laberinto.Maze2d;
 import laberinto.Propiedades;
 
-import java.net.URL;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
-import java.util.ResourceBundle;
 
 public class interfaz extends Application {
 
@@ -34,6 +34,8 @@ public class interfaz extends Application {
     JFXSlider slider;
     Label velocidad;
     Propiedades propiedades;
+    Label tituloColor;
+    JFXColorPicker colorAbierto;
 
     @Override
     public void start(Stage ventana) throws Exception {
@@ -63,9 +65,10 @@ public class interfaz extends Application {
         slider.setMin(1);
         slider.setMax(1000);
 
-        velocidad = new Label("Velocidad: " + slider.getValue());
+        VBox cajaColor = cargarComponentesEleccionColor();
 
-        contenedorRight.getChildren().addAll(btnCrearLaberinto, btnEmpezar, btnTerminar, velocidad, slider);
+        contenedorRight.getChildren().addAll(btnCrearLaberinto, btnEmpezar,
+                btnTerminar, velocidad, slider, cajaColor);
         contenedorRight.setAlignment(Pos.TOP_CENTER);
         contenedorRight.setOrientation(Orientation.valueOf("VERTICAL"));
         contenedorRight.setColumnHalignment(HPos.valueOf("CENTER"));
@@ -74,6 +77,7 @@ public class interfaz extends Application {
         FlowPane.setMargin(btnEmpezar, new Insets(20, 20, 20, 20));
         FlowPane.setMargin(btnTerminar, new Insets(20, 20, 20, 20));
         FlowPane.setMargin(slider, new Insets(5, 20, 20, 20));
+        FlowPane.setMargin(cajaColor, new Insets(40, 20, 20, 20));
         pane.setRight(contenedorRight);
 
         crearEventos();
@@ -118,6 +122,43 @@ public class interfaz extends Application {
 
         btnTerminar.setOnAction(e -> this.thread.stop());
 
+    }
+
+    private VBox cargarComponentesEleccionColor() {
+
+        VBox cajaColor = new VBox();
+        velocidad = new Label("Velocidad: " + slider.getValue());
+
+        tituloColor = new Label("Selecciona un color");
+        tituloColor.getStyleClass().add("seleccion-color");
+
+        Map<String, String> conf = cargarColores();
+        colorAbierto = new JFXColorPicker(Color.valueOf(conf.get("ABIERTO")));
+
+        cajaColor.getChildren().addAll(new HBox(tituloColor), new HBox(colorAbierto));
+
+        return cajaColor;
+    }
+
+    private Map<String, String> cargarColores() {
+
+        Properties p = new Properties();
+        Map<String, String> conf = new HashMap<>();
+        try {
+            FileInputStream file = new FileInputStream(new File("propiedades.properties"));
+            p.load(file);
+            /*
+PARED=\#000000
+ABIERTO=\#FFFFFF
+LLEGADA=\#FF0000
+VISITADO=\#0027FF
+ACTUAL=\#2AFF00
+             */
+            conf.put("ABIERTO", p.getProperty("ABIERTO"));
+
+        } catch (IOException e) {}
+
+        return conf;
     }
 
     public static void main(String[] args) {
