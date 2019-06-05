@@ -3,6 +3,7 @@ import com.jfoenix.controls.JFXSlider;
 import javafx.application.Application;
 import javafx.beans.binding.IntegerBinding;
 import javafx.beans.binding.NumberBinding;
+import javafx.fxml.Initializable;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
@@ -15,6 +16,11 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import laberinto.Maze2d;
+import laberinto.Propiedades;
+
+import java.net.URL;
+import java.util.Properties;
+import java.util.ResourceBundle;
 
 public class interfaz extends Application {
 
@@ -27,10 +33,13 @@ public class interfaz extends Application {
     Thread thread;
     JFXSlider slider;
     Label velocidad;
-    IntegerBinding velocity;
+    Propiedades propiedades;
 
     @Override
     public void start(Stage ventana) throws Exception {
+
+        propiedades = new Propiedades();
+        propiedades.crearPropiedades();
 
         laberinto = new Maze2d(100);
         pane = new BorderPane();
@@ -83,9 +92,6 @@ public class interfaz extends Application {
     }
 
     private void crearEventos() {
-
-        //velocity = slider.valueProperty().multiply(1);
-        //velocidad.textProperty().bind(velocity.asString("Velocidad %d"));
 
         slider.valueProperty().addListener((o, oldValue, newValue) -> {
             this.velocidad.setText("Velocidad: " + (int)slider.getValue());

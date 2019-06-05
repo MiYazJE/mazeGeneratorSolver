@@ -216,6 +216,7 @@ public class Maze2d extends VBox implements Runnable, EstadoCeldas {
             f = Integer.valueOf(str.split(" ")[0]);
             c = Integer.valueOf(str.split(" ")[1]);
             laberinto[f][c].pintarCelda(Color.RED);
+            if (f == 1 && c == 1) break;
             synchronized (this) {
                 try {
                     wait(10);
