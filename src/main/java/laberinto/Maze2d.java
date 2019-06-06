@@ -146,7 +146,7 @@ public class Maze2d extends VBox implements Runnable, EstadoCeldas {
 
     private void cargarDimensiones() {
         this.dimension = Integer.parseInt(conf.get("DIMENSION"));
-        this.sizeCelda = 850 / this.dimension;
+        this.sizeCelda = 1001 / dimension;
         laberinto = new Celda[this.dimension][this.dimension];
         maze = new int[this.dimension][this.dimension];
     }

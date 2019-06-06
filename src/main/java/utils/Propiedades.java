@@ -21,7 +21,7 @@ public class Propiedades {
             "VISITADO",  "#0027FF",
             "ACTUAL",    "#2AFF00",
             "LLEGADA",   "#FF0000",
-            "DIMENSION", "30"
+            "DIMENSION", "31"
     );
     Properties propiedades;
 

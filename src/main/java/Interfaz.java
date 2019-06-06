@@ -27,7 +27,7 @@ public class Interfaz extends Application {
     JFXButton btnCrearLaberinto;
     JFXButton btnEmpezar;
     JFXButton btnConfiguracion;
-    public static Maze2d laberinto;
+    private Maze2d laberinto;
     BorderPane pane;
     Thread thread;
     JFXSlider slider;
@@ -87,6 +87,7 @@ public class Interfaz extends Application {
         laberinto.requestFocus();
 
         thread = new Thread(laberinto);
+        ventana.setOnHidden(e -> thread.stop());
 
     }
 
@@ -96,8 +97,7 @@ public class Interfaz extends Application {
     }
 
     private void propiedadesContenedorLeft() {
-        contenedorLeft.setMinWidth(300);
-        BackgroundImage imagen = new BackgroundImage(new Image("/imagenes/laberinto.jpg",1920,1001,false,true),
+        BackgroundImage imagen = new BackgroundImage(new Image("/imagenes/laberinto.jpg",1920,1080,false,true),
                 BackgroundRepeat.REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT,
                 BackgroundSize.DEFAULT);
         contenedorLeft.setBackground(new Background(imagen));
@@ -160,10 +160,10 @@ public class Interfaz extends Application {
     }
 
     private void propiedadesSlider() {
-        slider.setMaxWidth(200);
-        slider.setValue(20);
+        slider.setMaxWidth(150);
+        slider.setValue(10);
         slider.setMin(1);
-        slider.setMax(1000);
+        slider.setMax(150);
     }
 
     private void lanzarVentanaConfiguracion() {
