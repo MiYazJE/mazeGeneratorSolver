@@ -13,7 +13,6 @@ import javafx.scene.paint.Color;
 import utils.Propiedades;
 
 import java.util.HashMap;
-import java.util.Properties;
 import java.util.Stack;
 
 public class Maze2d extends VBox implements Runnable, EstadoCeldas {
@@ -31,22 +30,17 @@ public class Maze2d extends VBox implements Runnable, EstadoCeldas {
     private int velocidad;
     private Jugador player;
     private GenerarLaberinto gen;
-    private HashMap<String, String> colores;
+    private HashMap<String, String> conf;
 
-    public Maze2d(int dim) {
+    public Maze2d() {
 
-        colores = Propiedades.cargarPropiedades();
+        conf = Propiedades.cargarPropiedades();
 
         this.player = new Jugador();
         crearEventosMovimiento();
-
-        // El algoritmo de creación de laberintos solo permite dimensiones impares
-        this.dimension = (dim %2 == 0) ? dim+1 : dim;
-        this.sizeCelda = 1000 / dimension;
-
-        laberinto = new Celda[dimension][dimension];
-        gen = new GenerarLaberinto(dimension, dimension);
-        generarLaberinto(50);
+        cargarDimensiones();
+        gen = new GenerarLaberinto(dimension);
+        generarLaberinto(velocidad);
 
         //MakeMazeDfs make = new MakeMazeDfs(dimension);
         //this.maze = make.getLaberinto();
@@ -73,10 +67,6 @@ public class Maze2d extends VBox implements Runnable, EstadoCeldas {
             if (player.x == dimension-2 && player.y == dimension-2)
                 System.out.println("VICTORIA");
         });
-
-    }
-
-    private void cargarProperties() {
 
     }
 
@@ -137,7 +127,7 @@ public class Maze2d extends VBox implements Runnable, EstadoCeldas {
         for (int i = 0; i < dimension; i++) {
             HBox fila = new HBox();
             for (int j = 0; j < dimension; j++) {
-                Celda celda = new Celda(i, j, maze[i][j], sizeCelda, colores);
+                Celda celda = new Celda(i, j, maze[i][j], sizeCelda, conf);
                 laberinto[i][j] = celda;
                 fila.getChildren().add(celda);
             }
@@ -146,10 +136,19 @@ public class Maze2d extends VBox implements Runnable, EstadoCeldas {
     }
 
     public void generarLaberinto(int velocidad) {
-        this.gen.crearLaberinto();
+        conf = Propiedades.cargarPropiedades();
+        cargarDimensiones();
+        this.gen.crearLaberinto(this.dimension);
         this.maze = gen.getLaberinto();
         this.velocidad = velocidad;
         pintarLaberinto();
+    }
+
+    private void cargarDimensiones() {
+        this.dimension = Integer.parseInt(conf.get("DIMENSION"));
+        this.sizeCelda = 850 / this.dimension;
+        laberinto = new Celda[this.dimension][this.dimension];
+        maze = new int[this.dimension][this.dimension];
     }
 
     /**
@@ -181,7 +180,7 @@ public class Maze2d extends VBox implements Runnable, EstadoCeldas {
 
             maze[i][j] = ACTUAL;
             ruta.push( i + " " + j);
-            pintar(i, j, Color.valueOf(colores.get("ACTUAL")));
+            pintar(i, j, Color.valueOf(conf.get("ACTUAL")));
 
             if (i == dimension-2 && j == dimension-2)
                 return true;
@@ -200,7 +199,7 @@ public class Maze2d extends VBox implements Runnable, EstadoCeldas {
 
             ruta.pop();
             maze[i][j] = VISITADO;
-            pintar(i, j, Color.valueOf(colores.get("VISITADO")));
+            pintar(i, j, Color.valueOf(conf.get("VISITADO")));
 
             synchronized (this) {
                 try {
@@ -225,7 +224,7 @@ public class Maze2d extends VBox implements Runnable, EstadoCeldas {
             String str = ruta.pop();
             f = Integer.valueOf(str.split(" ")[0]);
             c = Integer.valueOf(str.split(" ")[1]);
-            laberinto[f][c].pintarCelda(Color.valueOf(colores.get("LLEGADA")));
+            laberinto[f][c].pintarCelda(Color.valueOf(conf.get("LLEGADA")));
             if (f == 1 && c == 1) break;
             synchronized (this) {
                 try {

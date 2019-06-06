@@ -10,18 +10,16 @@ import javafx.scene.Parent;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
-import javafx.stage.Stage;
 import javafx.util.Duration;
+import utils.Propiedades;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.ResourceBundle;
@@ -44,8 +42,8 @@ public class VentanaSeleccionColores extends AnchorPane implements Initializable
     public VentanaSeleccionColores() {
         init();
         getChildren().add(parent);
-        conf = cargarPropiedades();
-        cargarColores();
+        conf = Propiedades.cargarPropiedades();
+        cargarValores();
     }
 
     private void init() {
@@ -88,32 +86,13 @@ public class VentanaSeleccionColores extends AnchorPane implements Initializable
         });
     }
 
-    private Map<String, String> cargarPropiedades() {
-
-        Properties p = new Properties();
-        Map<String, String> conf = new HashMap<>();
-        try {
-            FileInputStream file = new FileInputStream(new File("propiedades.properties"));
-            p.load(file);
-            conf.put("ABIERTO", p.getProperty("ABIERTO"));
-            conf.put("VISITADO", p.getProperty("VISITADO"));
-            conf.put("PARED", p.getProperty("PARED"));
-            conf.put("LLEGADA", p.getProperty("LLEGADA"));
-            conf.put("ACTUAL", p.getProperty("ACTUAL"));
-        } catch (IOException e) {
-            System.out.println(e.getMessage());
-            System.out.println(e.getClass().getName());
-        }
-
-        return conf;
-    }
-
-    private void cargarColores() {
+    private void cargarValores() {
         this.colorAbierto.setValue(Color.valueOf(conf.get("ABIERTO")));
         this.colorBacktrack.setValue(Color.valueOf(conf.get("VISITADO")));
         this.colorPared.setValue(Color.valueOf(conf.get("PARED")));
         this.colorFin.setValue(Color.valueOf(conf.get("LLEGADA")));
         this.colorRecorrido.setValue(Color.valueOf(conf.get("ACTUAL")));
+        this.fieldDimension.setText(conf.get("DIMENSION"));
     }
 
     private boolean guardarConfiguracion() {
@@ -131,9 +110,15 @@ public class VentanaSeleccionColores extends AnchorPane implements Initializable
             p.setProperty("VISITADO", this.colorBacktrack.getValue().toString());
             p.setProperty("LLEGADA", this.colorFin.getValue().toString());
             p.setProperty("ACTUAL", this.colorRecorrido.getValue().toString());
+            // Las dimensiones del laberinto solo pueden ser impares,
+            // el algoritmo de creación de laberintos lo requiere (autoOfBonds)
+            int dimension = Integer.valueOf(this.fieldDimension.getText());
+            dimension = (dimension %2 == 0) ? dimension+1 : dimension;
+            p.setProperty("DIMENSION", String.valueOf(dimension));
             p.store(new FileWriter(file.getAbsolutePath()), "Actualiando configuración");
 
             return true;
+
         } catch (IOException e) {
             System.out.println(e.getMessage());
             System.out.println(e.getClass().getName());

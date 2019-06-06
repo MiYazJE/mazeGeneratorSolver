@@ -20,14 +20,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-public class interfaz extends Application {
+public class Interfaz extends Application {
 
     StackPane contenedorGlobal;
     BorderPane contenedorLeft;
     JFXButton btnCrearLaberinto;
     JFXButton btnEmpezar;
     JFXButton btnConfiguracion;
-    Maze2d laberinto;
+    public static Maze2d laberinto;
     BorderPane pane;
     Thread thread;
     JFXSlider slider;
@@ -40,7 +40,7 @@ public class interfaz extends Application {
 
         cargarPropiedades();
 
-        laberinto = new Maze2d(100);
+        laberinto = new Maze2d();
         pane = new BorderPane();
         pane.setCenter(laberinto);
 
@@ -68,7 +68,7 @@ public class interfaz extends Application {
         contenedorLeft = new BorderPane();
         contenedorLeft.setCenter(cajaComponentes);
         contenedorLeft.setBottom(btnConfiguracion);
-        BorderPane.setMargin(btnConfiguracion, new Insets(0, 60, 50, 60));
+        BorderPane.setMargin(btnConfiguracion, new Insets(0, 60, 50, 70));
         propiedadesContenedorLeft();
         aplicarMargenes();
 
@@ -97,7 +97,7 @@ public class interfaz extends Application {
 
     private void propiedadesContenedorLeft() {
         contenedorLeft.setMinWidth(300);
-        BackgroundImage imagen = new BackgroundImage(new Image("/imagenes/laberinto.jpg",1920,1000,false,true),
+        BackgroundImage imagen = new BackgroundImage(new Image("/imagenes/laberinto.jpg",1920,1001,false,true),
                 BackgroundRepeat.REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT,
                 BackgroundSize.DEFAULT);
         contenedorLeft.setBackground(new Background(imagen));
@@ -118,6 +118,7 @@ public class interfaz extends Application {
         btnCrearLaberinto.setOnAction(e -> {
             if (this.thread.isAlive()) {
                 this.thread.stop();
+                this.laberinto.generarLaberinto((int)slider.getValue());
             }
             if (!this.thread.isAlive()) {
                 this.laberinto.generarLaberinto((int)slider.getValue());
@@ -166,14 +167,7 @@ public class interfaz extends Application {
     }
 
     private void lanzarVentanaConfiguracion() {
-
-        VentanaSeleccionColores ventana = new VentanaSeleccionColores();
-        Mensaje.mostrar(contenedorGlobal, ventana);
-
-        /*Stage stage = new Stage();
-        Scene scene = new Scene(ventana);
-        stage.setScene(scene);
-        stage.show();*/
+        Mensaje.mostrar(contenedorGlobal);
     }
 
     public static void main(String[] args) {

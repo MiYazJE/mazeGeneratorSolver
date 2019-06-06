@@ -19,14 +19,20 @@ public class GenerarLaberinto implements EstadoCeldas {
     private Stack<Celda> vecinos;
     private Random rnd = new Random();
 
-    public GenerarLaberinto(int f, int c) {
-        this.filas = f;
-        this.columnas = c;
-        this.maze = new int[filas][columnas];
-        crearLaberinto();
+    public GenerarLaberinto( int dim ) {
+        cargarDimensiones(dim);
+        crearLaberinto(dim);
     }
 
-    public void crearLaberinto() {
+    private void cargarDimensiones( int dim ) {
+        this.filas = dim;
+        this.columnas = dim;
+        this.maze = new int[dim][dim];
+    }
+
+    public void crearLaberinto(int dim) {
+
+        cargarDimensiones(dim);
 
         int i,j;
         int emptyCt = 0;

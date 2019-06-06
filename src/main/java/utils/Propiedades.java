@@ -16,11 +16,12 @@ public class Propiedades {
     private String rutaAbsoluta;
     private File archivo;
     private static final Map<String, String> propiedadesIniciales = Map.of(
-            "ABIERTO",  "#FFFFFF",
-            "PARED",    "#000000",
-            "VISITADO", "#0027FF",
-            "ACTUAL",   "#2AFF00",
-            "LLEGADA",  "#FF0000"
+            "ABIERTO",   "#FFFFFF",
+            "PARED",     "#000000",
+            "VISITADO",  "#0027FF",
+            "ACTUAL",    "#2AFF00",
+            "LLEGADA",   "#FF0000",
+            "DIMENSION", "30"
     );
     Properties propiedades;
 
@@ -89,6 +90,7 @@ public class Propiedades {
             conf.put("PARED", p.getProperty("PARED"));
             conf.put("LLEGADA", p.getProperty("LLEGADA"));
             conf.put("ACTUAL", p.getProperty("ACTUAL"));
+            conf.put("DIMENSION", p.getProperty("DIMENSION"));
         } catch (IOException e) {
             System.out.println(e.getMessage());
             System.out.println(e.getClass().getName());
