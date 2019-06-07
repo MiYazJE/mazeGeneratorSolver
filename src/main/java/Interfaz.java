@@ -1,4 +1,5 @@
 import com.jfoenix.controls.JFXButton;
+import com.jfoenix.controls.JFXCheckBox;
 import com.jfoenix.controls.JFXSlider;
 import controladores.VentanaSeleccionColores;
 import javafx.application.Application;
@@ -8,6 +9,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.layout.*;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import laberinto.Maze2d;
 import utils.Propiedades;
@@ -34,7 +36,6 @@ public class Interfaz extends Application {
     Label velocidad;
     Propiedades propiedades;
     VBox cajaComponentes;
-    private boolean hiloIniciado;
 
     @Override
     public void start(Stage ventana) throws IOException {
@@ -86,8 +87,6 @@ public class Interfaz extends Application {
         ventana.setResizable(false);
         ventana.show();
 
-        ventana.setOnHidden(e -> thread.stop());
-
     }
 
     private void cargarPropiedades() {
@@ -112,15 +111,17 @@ public class Interfaz extends Application {
 
         slider.valueProperty().addListener((o, oldValue, newValue) -> {
             this.velocidad.setText("Velocidad: " + (int)slider.getValue());
+            int num = Double.valueOf(slider.getValue()).intValue();
+            propiedades.almacenarVelocidad(String.valueOf(num));
         });
 
         btnCrearLaberinto.setOnAction(e -> {
             if (this.thread.isAlive()) {
                 this.thread.stop();
-                this.laberinto.generarLaberinto((int)slider.getValue());
+                this.laberinto.generarLaberinto();
             }
             if (!this.thread.isAlive()) {
-                this.laberinto.generarLaberinto((int)slider.getValue());
+                this.laberinto.generarLaberinto();
             }
         });
 
@@ -141,7 +142,8 @@ public class Interfaz extends Application {
 
     private void propiedadesSlider() {
         slider.setMaxWidth(150);
-        slider.setValue(10);
+        Integer valorSlider = Integer.valueOf(propiedades.obtenerPropiedad("VELOCIDAD"));
+        slider.setValue(valorSlider);
         slider.setMin(1);
         slider.setMax(150);
     }

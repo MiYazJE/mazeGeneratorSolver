@@ -32,14 +32,16 @@ public class Maze2d extends VBox implements Runnable, EstadoCeldas {
     private int dimension;
     private double sizeCelda;
     private Stack<String> ruta = new Stack<>();
-    private int velocidad;
+    private Long velocidad;
     private Jugador player;
     private GenerarLaberinto gen;
     public static HashMap<String, String> conf;
+    private Propiedades propiedades;
 
     public Maze2d() {
 
         conf = Propiedades.cargarPropiedades();
+        propiedades = new Propiedades();
 
         //this.player = new Jugador();
         //crearEventosMovimiento();
@@ -50,7 +52,7 @@ public class Maze2d extends VBox implements Runnable, EstadoCeldas {
             pintarLaberinto();
         }
         else {
-            generarLaberinto(velocidad);
+            generarLaberinto();
         }
 
         //MakeMazeDfs make = new MakeMazeDfs(dimension);
@@ -148,25 +150,29 @@ public class Maze2d extends VBox implements Runnable, EstadoCeldas {
 
     private void cargarDimensiones() {
         this.dimension = Integer.parseInt(conf.get("DIMENSION"));
-        this.sizeCelda = 900 / dimension;
+        this.sizeCelda = 1000 / dimension;
         gen = new GenerarLaberinto(dimension);
         laberinto = new Celda[dimension][dimension];
         maze = new int[dimension][dimension];
-        this.velocidad = Integer.parseInt(conf.get("VELOCIDAD"));
+        this.velocidad = leerVelocidad();
     }
 
-    public void generarLaberinto(int velocidad) {
+    public void generarLaberinto() {
         conf = Propiedades.cargarPropiedades();
         cargarDimensiones();
         if (conf.get("MODO").equals("PINTAR")) {
             pintarLaberinto();
-            this.velocidad = Integer.parseInt(conf.get("VELOCIDAD"));
+            this.velocidad = leerVelocidad();
             return;
         }
         this.gen.crearLaberinto(this.dimension);
         this.maze = gen.getLaberinto();
         this.velocidad = velocidad;
         pintarLaberinto();
+    }
+
+    private Long leerVelocidad() {
+        return Long.parseLong(propiedades.obtenerPropiedad("VELOCIDAD"));
     }
 
     /**
@@ -206,7 +212,7 @@ public class Maze2d extends VBox implements Runnable, EstadoCeldas {
 
             synchronized (this) {
                 try {
-                    wait(velocidad);
+                    wait(leerVelocidad());
                 } catch (InterruptedException e) { }
             }
 
@@ -222,7 +228,7 @@ public class Maze2d extends VBox implements Runnable, EstadoCeldas {
 
             synchronized (this) {
                 try {
-                    wait(velocidad);
+                    wait(leerVelocidad());
                 } catch (InterruptedException e) { }
             }
 
@@ -241,9 +247,11 @@ public class Maze2d extends VBox implements Runnable, EstadoCeldas {
             c = Integer.valueOf(str.split(" ")[1]);
             laberinto[f][c].pintarCelda("LLEGADA");
             if (f == 1 && c == 1) break;
-            try {
-                wait(velocidad);
-            } catch (InterruptedException e) { }
+            synchronized (this) {
+                try {
+                    wait(leerVelocidad());
+                } catch (InterruptedException e) { }
+            }
         }
     }
 

@@ -6,6 +6,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import laberinto.Maze2d;
+import utils.Propiedades;
 
 import java.util.HashMap;
 
@@ -14,15 +15,16 @@ public class Celda extends Rectangle implements EstadoCeldas {
     private int fila;
     private int columna;
     private int valor;
-    private HashMap<String, String> conf = Maze2d.conf;
+    private Propiedades p;
 
     public Celda(int f, int c, int estado, double size) {
         super(size, size);
         this.fila = f;
         this.columna = c;
         this.valor = estado;
+        p = new Propiedades();
         aplicarEstilo(estado);
-        if (conf.get("MODO").equals("PINTAR")) aplicarEventos();
+        if (p.obtenerPropiedad("MODO").equals("PINTAR")) aplicarEventos();
     }
 
     private void aplicarEstilo(int estado) {
@@ -42,7 +44,7 @@ public class Celda extends Rectangle implements EstadoCeldas {
     }
 
     public void pintarCelda(String color) {
-        this.setFill(Color.valueOf(conf.get(color)));
+        this.setFill(Color.valueOf(p.obtenerPropiedad(color)));
     }
 
     private void aplicarEventos() {

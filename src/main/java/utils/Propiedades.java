@@ -3,6 +3,8 @@
  */
 package utils;
 
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.PropertiesConfiguration;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
@@ -25,7 +27,7 @@ public class Propiedades {
             "MODO",      "PINTAR",
             "VELOCIDAD", "50"
     );
-    Properties propiedades;
+    private Properties propiedades;
 
     public Propiedades() {
         this.archivo = new File("propiedades.properties");
@@ -62,7 +64,7 @@ public class Propiedades {
             for (Map.Entry<String, String> entry : propiedadesIniciales.entrySet()) {
                 propiedades.setProperty(entry.getKey(), entry.getValue());
             }
-            propiedades.store(new FileWriter(this.rutaAbsoluta), rutaAbsoluta + "\nEscribiendo configuración predeterminada.");
+            propiedades.store(new FileWriter(this.rutaAbsoluta), rutaAbsoluta + "\nEscribiendo configuracion predeterminada.");
 
         } catch (IOException e) {
             System.out.println("Problemas al escribir en el fichero de configuración.\n" +
@@ -82,7 +84,7 @@ public class Propiedades {
      */
     public static HashMap<String, String> cargarPropiedades() {
 
-        java.util.Properties p = new java.util.Properties();
+        Properties p = new java.util.Properties();
         HashMap<String, String> conf = new HashMap<>();
         try {
             FileInputStream file = new FileInputStream(new File("propiedades.properties"));
@@ -101,6 +103,26 @@ public class Propiedades {
         }
 
         return conf;
+    }
+
+    public void almacenarVelocidad(String velocidad) {
+        try {
+            PropertiesConfiguration config = new PropertiesConfiguration(rutaAbsoluta);
+            config.setProperty("VELOCIDAD", Long.parseLong(velocidad));
+            config.save();
+        } catch (ConfigurationException e) {}
+    }
+
+    public String obtenerPropiedad(String propiedad) {
+        try {
+            FileInputStream file = new FileInputStream(new File("propiedades.properties"));
+            propiedades.load(file);
+            return propiedades.getProperty(propiedad);
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+            System.out.println(e.getClass().getName());
+            return "";
+        }
     }
 
 }
