@@ -27,13 +27,14 @@ public class Interfaz extends Application {
     JFXButton btnCrearLaberinto;
     JFXButton btnEmpezar;
     JFXButton btnConfiguracion;
-    private Maze2d laberinto;
+    Maze2d laberinto;
     BorderPane pane;
     Thread thread;
     JFXSlider slider;
     Label velocidad;
     Propiedades propiedades;
     VBox cajaComponentes;
+    private boolean hiloIniciado;
 
     @Override
     public void start(Stage ventana) throws IOException {
@@ -84,9 +85,7 @@ public class Interfaz extends Application {
         ventana.setTitle("Laberinto");
         ventana.setResizable(false);
         ventana.show();
-        laberinto.requestFocus();
 
-        thread = new Thread(laberinto);
         ventana.setOnHidden(e -> thread.stop());
 
     }
@@ -126,13 +125,8 @@ public class Interfaz extends Application {
         });
 
         btnEmpezar.setOnAction(e -> {
-            if (thread != null) {
-                if (!this.thread.isAlive()) {
-                    this.laberinto.generarLaberinto((int)slider.getValue());
-                    this.thread = new Thread(laberinto);
-                    this.thread.start();
-                }
-            }
+            thread = new Thread(laberinto);
+            this.thread.start();
         });
 
         btnConfiguracion.setOnAction(e -> lanzarVentanaConfiguracion());
@@ -143,20 +137,6 @@ public class Interfaz extends Application {
         BorderPane.setMargin(btnCrearLaberinto, new Insets(50, 30, 30, 30));
         BorderPane.setMargin(slider, new Insets(30, 30, 30, 30));
         BorderPane.setMargin(btnEmpezar, new Insets(5, 30, 30, 30));
-    }
-
-    private Map<String, String> cargarColores() {
-
-        Properties p = new Properties();
-        Map<String, String> conf = new HashMap<>();
-        try {
-            FileInputStream file = new FileInputStream(new File("propiedades.properties"));
-            p.load(file);
-            conf.put("ABIERTO", p.getProperty("ABIERTO"));
-
-        } catch (IOException e) {}
-
-        return conf;
     }
 
     private void propiedadesSlider() {

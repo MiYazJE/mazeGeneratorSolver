@@ -21,7 +21,9 @@ public class Propiedades {
             "VISITADO",  "#0027FF",
             "ACTUAL",    "#2AFF00",
             "LLEGADA",   "#FF0000",
-            "DIMENSION", "31"
+            "DIMENSION", "31",
+            "MODO",      "PINTAR",
+            "VELOCIDAD", "50"
     );
     Properties propiedades;
 
@@ -91,6 +93,8 @@ public class Propiedades {
             conf.put("LLEGADA", p.getProperty("LLEGADA"));
             conf.put("ACTUAL", p.getProperty("ACTUAL"));
             conf.put("DIMENSION", p.getProperty("DIMENSION"));
+            conf.put("MODO", p.getProperty("MODO"));
+            conf.put("VELOCIDAD", p.getProperty("VELOCIDAD"));
         } catch (IOException e) {
             System.out.println(e.getMessage());
             System.out.println(e.getClass().getName());

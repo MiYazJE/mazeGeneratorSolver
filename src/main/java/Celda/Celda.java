@@ -1,47 +1,115 @@
 package Celda;
 
+import javafx.event.EventHandler;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import laberinto.Maze2d;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
 
 public class Celda extends Rectangle implements EstadoCeldas {
 
     private int fila;
     private int columna;
-    private HashMap<String, String> colores;
+    private int valor;
+    private HashMap<String, String> conf = Maze2d.conf;
 
-    public Celda(int fila, int columna, int estado, double size, HashMap<String, String> colores) {
+    public Celda(int f, int c, int estado, double size) {
         super(size, size);
-        this.colores = colores;
-        this.fila = fila;
-        this.columna = columna;
+        this.fila = f;
+        this.columna = c;
+        this.valor = estado;
         aplicarEstilo(estado);
+        if (conf.get("MODO").equals("PINTAR")) aplicarEventos();
     }
 
     private void aplicarEstilo(int estado) {
         if (estado == PARED)
-            setFill(Color.valueOf(colores.get("PARED")));
+            pintarCelda("PARED");
         if (estado == ABIERTO)
-            setFill(Color.valueOf(colores.get("ABIERTO")));
+            pintarCelda("ABIERTO");
         if (estado == LLEGADA)
-            setFill(Color.valueOf(colores.get("LLEGADA")));
+            pintarCelda("LLEGADA");
         if (estado == ACTUAL)
-            setFill(Color.valueOf(colores.get("ACTUAL")));
+            pintarCelda("ACTUAL");
         if (estado == VISITADO)
-            setFill(Color.valueOf(colores.get("VISITADO")));
+            pintarCelda("VISITADO");
         if (!(estado != VISITADO &&
               estado != ACTUAL))
             setStroke(Color.BLACK);
     }
 
-    public void pintarCelda(Color color) {
-        this.setFill(color);
+    public void pintarCelda(String color) {
+        this.setFill(Color.valueOf(conf.get(color)));
+    }
+
+    private void aplicarEventos() {
+        this.setOnMouseClicked(e -> {
+            if (e.getButton() == MouseButton.SECONDARY) {
+                pintarCelda("PARED");
+                this.setPared();
+            }
+            if (e.getButton() == MouseButton.PRIMARY){
+                pintarCelda("ABIERTO");
+                this.setAbierto();
+            }
+        });
+        this.setOnMouseEntered(e -> {
+            if (e.isShiftDown()) {
+                pintarCelda("ABIERTO");
+                this.setAbierto();
+            }
+            if (e.isAltDown()) {
+                pintarCelda("PARED");
+                this.setPared();
+            }
+        });
+    }
+
+    private void setAbierto() {
+        this.valor = ABIERTO;
+    }
+
+    private void setPared() {
+        this.valor = PARED;
+    }
+
+    public void setActual() {
+        this.valor = ACTUAL;
+    }
+
+    public void setVisitado() {
+        this.valor = VISITADO;
+    }
+
+    public boolean estaAbierta() {
+        return (this.valor == ABIERTO);
+    }
+
+    public int getFila() {
+        return this.fila;
+    }
+
+    public void setFila(int fila) {
+        this.fila = fila;
+    }
+
+    public int getColumna() {
+        return this.columna;
+    }
+
+    public void setColumna(int columna) {
+        this.columna = columna;
+    }
+
+    public int getValor() {
+        return this.valor;
+    }
+
+    public void setValor(int valor) {
+        this.valor = valor;
     }
 
 }
