@@ -13,6 +13,14 @@
     </properties>
 
     <dependencies>
+
+        <!-- https://mvnrepository.com/artifact/commons-configuration/commons-configuration -->
+        <dependency>
+            <groupId>commons-configuration</groupId>
+            <artifactId>commons-configuration</artifactId>
+            <version>1.10</version>
+        </dependency>
+
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-controls</artifactId>
@@ -108,7 +116,7 @@
                 <version>1.6.0</version>
                 <configuration>
                     <classpathScope>test</classpathScope>
-                    <mainClass>test</mainClass>
+                    <mainClass>Interfaz</mainClass>
                 </configuration>
                 <executions>
                     <execution>
@@ -132,7 +140,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>test</mainClass>
+                            <mainClass>Interfaz</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>
@@ -150,7 +158,7 @@
                         <manifest>
                             <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
                             <addClasspath>true</addClasspath>
-                            <mainClass>test</mainClass>
+                            <mainClass>Interfaz</mainClass>
                         </manifest>
                         <manifestEntries>
                             <Class-Path>src/main/</Class-Path>
