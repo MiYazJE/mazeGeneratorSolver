@@ -27,7 +27,8 @@ public class Celda extends Rectangle implements EstadoCeldas {
         this.valor = estado;
         p = new Propiedades();
         aplicarEstilo(estado);
-        if (p.obtenerPropiedad("MODO").equals("PINTAR")) aplicarEventos();
+        //if (p.obtenerPropiedad("MODO").equals("PINTAR")) aplicarEventos();
+        aplicarEventos();
     }
 
     /**
@@ -36,18 +37,19 @@ public class Celda extends Rectangle implements EstadoCeldas {
      */
     private void aplicarEstilo(int estado) {
         if (estado == PARED)
-            pintarCelda("PARED");
+            setPared();
+
         if (estado == ABIERTO)
-            pintarCelda("ABIERTO");
+            setAbierto();
+
         if (estado == LLEGADA)
-            pintarCelda("LLEGADA");
+            setLlegada();
+
         if (estado == ACTUAL)
-            pintarCelda("ACTUAL");
-        if (estado == VISITADO)
-            pintarCelda("VISITADO");
-        if (!(estado != VISITADO &&
-              estado != ACTUAL))
-            setStroke(Color.BLACK);
+            setActual();
+
+        if (estado == INICIO)
+            setInicio();
     }
 
     /**
@@ -75,60 +77,57 @@ public class Celda extends Rectangle implements EstadoCeldas {
     private void aplicarEventos() {
         this.setOnMouseClicked(e -> {
             if (e.getButton() == MouseButton.SECONDARY) {
-                pintarCelda("PARED");
-                this.setPared();
+                this.setLlegada();
             }
             if (e.getButton() == MouseButton.PRIMARY){
-                pintarCelda("ABIERTO");
-                this.setAbierto();
+                this.setInicio();
             }
         });
         this.setOnMouseEntered(e -> {
             if (e.isShiftDown()) {
-                pintarCelda("ABIERTO");
                 this.setAbierto();
             }
             if (e.isAltDown()) {
-                pintarCelda("PARED");
                 this.setPared();
             }
         });
     }
 
-    private void setAbierto() {
+    public void setAbierto() {
         this.valor = ABIERTO;
+        pintarCelda("ABIERTO");
     }
 
-    private void setPared() {
+    public void setPared() {
         this.valor = PARED;
+        pintarCelda("PARED");
+    }
+
+    public void setEnd() {
+        this.valor = LLEGADA;
     }
 
     public void setActual() {
         this.valor = ACTUAL;
+        pintarCelda("ACTUAL");
     }
 
-    public void setVisitado() {
-        this.valor = VISITADO;
+    public void setInicio() {
+        this.valor = INICIO;
+        pintarCelda("INICIO");
     }
 
-    public boolean estaAbierta() {
+    public void setLlegada() {
+        this.valor = LLEGADA;
+        pintarCelda("LLEGADA");
+    }
+
+    public boolean isOpen() {
         return (this.valor == ABIERTO);
     }
 
-    public int getFila() {
-        return this.fila;
-    }
-
-    public void setFila(int fila) {
-        this.fila = fila;
-    }
-
-    public int getColumna() {
-        return this.columna;
-    }
-
-    public void setColumna(int columna) {
-        this.columna = columna;
+    public boolean isEnd() {
+        return this.valor == LLEGADA;
     }
 
     public int getValor() {
@@ -139,5 +138,16 @@ public class Celda extends Rectangle implements EstadoCeldas {
         this.valor = valor;
     }
 
+    public boolean isStart() {
+        return this.valor == INICIO;
+    }
+
+    public int getFila() {
+        return fila;
+    }
+
+    public int getColumna() {
+        return columna;
+    }
 }
 

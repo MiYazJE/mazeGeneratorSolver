@@ -19,21 +19,19 @@ import org.apache.commons.configuration.PropertiesConfiguration;
 import utils.Propiedades;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Map;
-import java.util.Properties;
 import java.util.ResourceBundle;
 
 public class VentanaSeleccionColores extends AnchorPane implements Initializable  {
 
     @FXML private JFXColorPicker colorAbierto;
     @FXML private JFXColorPicker colorPared;
-    @FXML private JFXColorPicker colorFin;
-    @FXML private JFXColorPicker colorBacktrack;
+    @FXML private JFXColorPicker colorVueltaFin;
     @FXML private JFXColorPicker colorRecorrido;
+    @FXML private JFXColorPicker colorInicio;
+    @FXML private JFXColorPicker colorLlegada;
     @FXML private JFXButton btnAplicar;
     @FXML private JFXTextField fieldDimension;
     @FXML private ImageView imgQuestion;
@@ -103,10 +101,11 @@ public class VentanaSeleccionColores extends AnchorPane implements Initializable
      */
     private void cargarValores() {
         this.colorAbierto.setValue(Color.valueOf(conf.get("ABIERTO")));
-        this.colorBacktrack.setValue(Color.valueOf(conf.get("VISITADO")));
         this.colorPared.setValue(Color.valueOf(conf.get("PARED")));
-        this.colorFin.setValue(Color.valueOf(conf.get("LLEGADA")));
+        this.colorVueltaFin.setValue(Color.valueOf(conf.get("VUELTA")));
         this.colorRecorrido.setValue(Color.valueOf(conf.get("ACTUAL")));
+        this.colorInicio.setValue( Color.valueOf(conf.get("INICIO")) );
+        this.colorLlegada.setValue(Color.valueOf(conf.get("LLEGADA")));
         this.fieldDimension.setText(conf.get("DIMENSION"));
         this.checkModo.setSelected( conf.get("MODO").equals("PINTAR") );
     }
@@ -124,8 +123,7 @@ public class VentanaSeleccionColores extends AnchorPane implements Initializable
 
             p.setProperty("ABIERTO", this.colorAbierto.getValue().toString());
             p.setProperty("PARED", this.colorPared.getValue().toString());
-            p.setProperty("VISITADO", this.colorBacktrack.getValue().toString());
-            p.setProperty("LLEGADA", this.colorFin.getValue().toString());
+            p.setProperty("VUELTA", this.colorVueltaFin.getValue().toString());
             p.setProperty("ACTUAL", this.colorRecorrido.getValue().toString());
 
             // Las dimensiones del laberinto solo pueden ser impares,

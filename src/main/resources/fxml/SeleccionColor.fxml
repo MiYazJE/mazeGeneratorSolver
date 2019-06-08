@@ -15,7 +15,6 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-
 <StackPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <AnchorPane prefHeight="721.0" prefWidth="519.0">
@@ -50,20 +49,26 @@
                   </HBox>
                   <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
                      <children>
-                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Celda FIN" wrappingWidth="108.6279296875" />
-                        <JFXColorPicker fx:id="colorFin" />
-                     </children>
-                  </HBox>
-                  <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
-                     <children>
-                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Celda BACKTRACK" wrappingWidth="127.6279296875" />
-                        <JFXColorPicker fx:id="colorBacktrack" />
+                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Celda VUELTA FIN" wrappingWidth="127.6279296875" />
+                        <JFXColorPicker fx:id="colorVueltaFin" />
                      </children>
                   </HBox>
                   <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
                      <children>
                         <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Celda RECORRIDO" wrappingWidth="135.6279296875" />
                         <JFXColorPicker fx:id="colorRecorrido" />
+                     </children>
+                  </HBox>
+                  <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
+                     <children>
+                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Celda INICIO" wrappingWidth="127.6279296875" />
+                        <JFXColorPicker fx:id="colorInicio" />
+                     </children>
+                  </HBox>
+                  <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
+                     <children>
+                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Celda FIN" wrappingWidth="127.6279296875" />
+                        <JFXColorPicker fx:id="colorLlegada" />
                      </children>
                   </HBox>
                   <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="10.0">

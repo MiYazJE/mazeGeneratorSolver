@@ -5,14 +5,7 @@ package laberinto;
 
 import Celda.*;
 import Generador.GenerarLaberinto;
-import Jugador.Jugador;
-import javafx.application.Platform;
-import javafx.geometry.Pos;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import utils.Propiedades;
@@ -22,109 +15,26 @@ import java.util.Stack;
 
 public class Maze2d extends VBox implements Runnable, EstadoCeldas {
 
-    private enum direcciones {
-        ARRIBA, ABAJO, DERECHA, IZQUIERDA
-    }
-
     private int[][] maze;
     // Almacena cada una de las celdas generadas en el laberinto
     private Celda[][] laberinto;
     private int dimension;
     private double sizeCelda;
     private Stack<String> ruta = new Stack<>();
-    private Long velocidad;
-    private Jugador player;
     private GenerarLaberinto gen;
     private HashMap<String, String> conf;
     private Propiedades propiedades;
+    private int inicioX;
+    private int inicioY;
 
     public Maze2d() {
 
-        conf = Propiedades.cargarPropiedades();
         propiedades = new Propiedades();
-
-        //this.player = new Jugador();
-        //crearEventosMovimiento();
-
-        cargarDimensiones();
-
-        if (conf.get("MODO").equals("PINTAR")) {
-            pintarLaberinto();
-        }
-        else {
-            generarLaberinto();
-        }
+        this.gen = new GenerarLaberinto();
+        generarLaberinto();
 
         //MakeMazeDfs make = new MakeMazeDfs(dimension);
         //this.maze = make.getLaberinto();
-    }
-
-    private void crearEventosMovimiento() {
-
-        this.setOnKeyPressed(key -> {
-            if (key.getCode() == KeyCode.UP)    {
-                moverJugador(direcciones.ARRIBA);
-            }
-            if (key.getCode() == KeyCode.DOWN)  {
-                moverJugador(direcciones.ABAJO);
-            }
-            if (key.getCode() == KeyCode.LEFT)  {
-                moverJugador(direcciones.IZQUIERDA);
-            }
-            if (key.getCode() == KeyCode.RIGHT) {
-                moverJugador(direcciones.DERECHA);
-            }
-        });
-
-        this.setOnKeyReleased(e -> {
-            if (player.x == dimension-2 && player.y == dimension-2)
-                System.out.println("VICTORIA");
-        });
-
-    }
-
-    private void pintarCeldaVacio(Celda celda) {
-        celda.pintarCelda("ABIERTO");
-    }
-
-    private void pintarCeldaActual(Celda celda) {
-        celda.pintarCelda("ACTUAL");
-    }
-
-    private void moverJugador(direcciones direccion) {
-
-        int f = player.y;
-        int c = player.x;
-
-        switch (direccion) {
-            case ABAJO:
-                if (esSeguro(f+1, c)) {
-                    player.mover(1, 0);
-                    pintarCeldaVacio(laberinto[f][c]);
-                    pintarCeldaActual(laberinto[f+1][c]);
-                }
-                break;
-            case ARRIBA:
-                if (esSeguro(f-1, c)) {
-                    player.mover(-1, 0);
-                    pintarCeldaVacio(laberinto[f][c]);
-                    pintarCeldaActual(laberinto[f-1][c]);
-                }
-                break;
-            case DERECHA:
-                if (esSeguro(f, c+1)) {
-                    player.mover(0, 1);
-                    pintarCeldaVacio(laberinto[f][c]);
-                    pintarCeldaActual(laberinto[f][c+1]);
-                }
-                break;
-            case IZQUIERDA:
-                if (esSeguro(f, c-1)) {
-                    player.mover(0, -1);
-                    pintarCeldaVacio(laberinto[f][c]);
-                    pintarCeldaActual(laberinto[f][c-1]);
-                }
-        }
     }
 
     /**
@@ -140,7 +50,7 @@ public class Maze2d extends VBox implements Runnable, EstadoCeldas {
         for (int i = 0; i < dimension; i++) {
             HBox fila = new HBox();
             for (int j = 0; j < dimension; j++) {
-                Celda celda = new Celda(i, j, 1, sizeCelda);
+                Celda celda = new Celda(i, j, maze[i][j], sizeCelda);
                 laberinto[i][j] = celda;
                 fila.getChildren().add(celda);
             }
@@ -151,23 +61,17 @@ public class Maze2d extends VBox implements Runnable, EstadoCeldas {
     private void cargarDimensiones() {
         this.dimension = Integer.parseInt(conf.get("DIMENSION"));
         this.sizeCelda = 1000 / dimension;
-        gen = new GenerarLaberinto(dimension);
-        laberinto = new Celda[dimension][dimension];
-        maze = new int[dimension][dimension];
-        this.velocidad = leerVelocidad();
+        this.maze = new int[dimension][dimension];
+        this.laberinto = new Celda[dimension][dimension];
     }
 
     public void generarLaberinto() {
         conf = Propiedades.cargarPropiedades();
         cargarDimensiones();
-        if (conf.get("MODO").equals("PINTAR")) {
-            pintarLaberinto();
-            this.velocidad = leerVelocidad();
-            return;
+        if (!conf.get("MODO").equals("PINTAR")) {
+            this.gen.crearLaberinto(this.dimension);
+            this.maze = gen.getLaberinto();
         }
-        this.gen.crearLaberinto(this.dimension);
-        this.maze = gen.getLaberinto();
-        this.velocidad = velocidad;
         pintarLaberinto();
     }
 
@@ -175,41 +79,45 @@ public class Maze2d extends VBox implements Runnable, EstadoCeldas {
         return Long.parseLong(propiedades.obtenerPropiedad("VELOCIDAD"));
     }
 
-    /**
-     * Método que indicando la posición X e Y de un laberinto devuelve true
-     * si no nos salimos de él y si no nos chocamos contra una pared.
-     * @param fila
-     * @param columna
-     * @return boolean
-     */
-    private boolean esSeguro(int fila, int columna) {
-        return (fila >= 0 && fila < maze.length &&
-                columna >= 0 && columna < maze[0].length &&
-                maze[fila][columna] != PARED);
-    }
-
     @Override
     public void run() {
-        ruta.clear();
-        conf = Propiedades.cargarPropiedades();
-        resolver(1, 1);
-        // imprimir();
+        buscarInicio();
+        resolver(inicioY, inicioX);
         marcarRuta();
+    }
+
+    private void buscarInicio() {
+        boolean salir = false;
+        for (int i = 0; i < dimension; i++) {
+            for (int j = 0; j < dimension; j++) {
+                if (laberinto[i][j].isStart()) {
+                    this.inicioY = laberinto[i][j].getFila();
+                    this.inicioX = laberinto[i][j].getColumna();
+                    salir = true; break;
+                }
+            }
+            if (salir) break;
+        }
     }
 
     private boolean fuera(int f, int c) {
         return (f < 0 || c < 0 || f >= dimension || c >= dimension);
     }
 
+    private boolean isValid(Celda celda) {
+        return celda.isOpen() || celda.isStart() || celda.isEnd();
+    }
+
     private boolean resolver(int i, int j) {
 
-        if (!fuera(i, j) && laberinto[i][j].estaAbierta()) {
+        if (!fuera(i, j) && isValid(laberinto[i][j])) {
 
-            ruta.push( String.valueOf(i).concat(" ").concat(String.valueOf(j)) );
-            laberinto[i][j].pintarCelda("ACTUAL");
-            laberinto[i][j].setActual();
+            ruta.push( i + " " + j );
 
-            if (i == dimension-2 && j == dimension-2)
+            if (laberinto[i][j].isOpen())
+                laberinto[i][j].setActual();
+
+            if (laberinto[i][j].isEnd())
                 return true;
 
             synchronized (this) {
@@ -217,7 +125,6 @@ public class Maze2d extends VBox implements Runnable, EstadoCeldas {
                     wait(leerVelocidad());
                 } catch (InterruptedException e) { }
             }
-
 
             if (resolver(i - 1, j) ||
                     resolver(i + 1, j) ||
@@ -226,14 +133,15 @@ public class Maze2d extends VBox implements Runnable, EstadoCeldas {
                 return true;
 
             if (!ruta.isEmpty()) ruta.pop();
-            laberinto[i][j].pintarCelda("VISITADO");
+
+            /*laberinto[i][j].pintarCelda("VISITADO");
             laberinto[i][j].setVisitado();
 
             synchronized (this) {
                 try {
                     wait(leerVelocidad());
                 } catch (InterruptedException e) { }
-            }
+            }*/
 
         }
 
@@ -241,21 +149,35 @@ public class Maze2d extends VBox implements Runnable, EstadoCeldas {
     }
 
     private void marcarRuta() {
+
         Integer f;
         Integer c;
-        System.out.println(ruta);
+
         while (!ruta.isEmpty()) {
+
             String str = ruta.pop();
             f = Integer.valueOf(str.split(" ")[0]);
             c = Integer.valueOf(str.split(" ")[1]);
-            laberinto[f][c].pintarCelda("LLEGADA");
-            if (f == 1 && c == 1) break;
+
+            if (laberinto[f][c].getValor() == ACTUAL) {
+                laberinto[f][c].pintarCelda("VUELTA");
+            }
+
+            laberinto[f][c].setValor(ABIERTO);
+
+            System.out.println(f + " " + c);
+
             synchronized (this) {
                 try {
                     wait(leerVelocidad());
                 } catch (InterruptedException e) { }
             }
+
         }
+
+        // Limpiamos las rutas para la siguiente busqueda
+        ruta.clear();
+        System.out.println("Terminando de imprimir ruta...");
     }
 
     private void imprimir() {

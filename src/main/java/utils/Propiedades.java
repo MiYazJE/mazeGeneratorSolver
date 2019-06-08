@@ -28,9 +28,10 @@ public class Propiedades {
     private static final Map<String, String> propiedadesIniciales = Map.of(
             "ABIERTO",   "#FFFFFF",
             "PARED",     "#000000",
-            "VISITADO",  "#0027FF",
             "ACTUAL",    "#2AFF00",
-            "LLEGADA",   "#FF0000",
+            "LLEGADA",   "#F3FF00",
+            "VUELTA",    "FF0000",
+            "INICIO",    "#0087FF",
             "DIMENSION", "31",
             "MODO",      "PINTAR",
             "VELOCIDAD", "50"
@@ -98,7 +99,8 @@ public class Propiedades {
             FileInputStream file = new FileInputStream(new File("propiedades.properties"));
             p.load(file);
             conf.put("ABIERTO", p.getProperty("ABIERTO"));
-            conf.put("VISITADO", p.getProperty("VISITADO"));
+            conf.put("INICIO", p.getProperty("INICIO"));
+            conf.put("VUELTA", p.getProperty("VUELTA"));
             conf.put("PARED", p.getProperty("PARED"));
             conf.put("LLEGADA", p.getProperty("LLEGADA"));
             conf.put("ACTUAL", p.getProperty("ACTUAL"));

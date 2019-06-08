@@ -5,23 +5,14 @@ package Generador;
 
 import Celda.*;
 
-import java.util.Random;
-import java.util.Stack;
-
 public class GenerarLaberinto implements EstadoCeldas {
 
     private int filas;
     private int columnas;
     private int[][] maze;
-    private Stack<Celda> pila = new Stack<>();
-    private Celda[][] celdas;
-    private Celda actual;
-    private Stack<Celda> vecinos;
-    private Random rnd = new Random();
 
-    public GenerarLaberinto( int dim ) {
-        cargarDimensiones(dim);
-        crearLaberinto(dim);
+    public GenerarLaberinto(  ) {
+
     }
 
     private void cargarDimensiones( int dim ) {

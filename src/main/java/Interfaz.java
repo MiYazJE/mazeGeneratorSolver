@@ -117,14 +117,16 @@ public class Interfaz extends Application {
         });
 
         btnCrearLaberinto.setOnAction(e -> {
-            thread.stop();
+            this.thread.stop();
             this.laberinto.generarLaberinto();
-            thread = new Thread(laberinto);
+            this.thread = new Thread(laberinto);
         });
 
         btnEmpezar.setOnAction(e -> {
-            thread = new Thread(laberinto);
-            this.thread.start();
+            if (!this.thread.isAlive()) {
+                this.thread = new Thread(laberinto);
+                this.thread.start();
+            }
         });
 
         btnConfiguracion.setOnAction(e -> lanzarVentanaConfiguracion());
