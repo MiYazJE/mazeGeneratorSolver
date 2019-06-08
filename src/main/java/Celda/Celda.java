@@ -19,6 +19,7 @@ public class Celda extends Rectangle implements EstadoCeldas {
     private int columna;
     private int valor;
     private Propiedades p;
+    private int anteriorColor;
 
     public Celda(int f, int c, int estado, double size) {
         super(size, size);
@@ -76,12 +77,31 @@ public class Celda extends Rectangle implements EstadoCeldas {
      */
     private void aplicarEventos() {
         this.setOnMouseClicked(e -> {
+
             if (e.getButton() == MouseButton.SECONDARY) {
-                this.setLlegada();
+                if (this.getValor() == LLEGADA) {
+                    if (anteriorColor == PARED)   setPared();
+                    if (anteriorColor == INICIO)  setInicio();
+                    if (anteriorColor == ABIERTO) setAbierto();
+                }
+                else {
+                    anteriorColor = this.getValor();
+                    this.setLlegada();
+                }
             }
-            if (e.getButton() == MouseButton.PRIMARY){
-                this.setInicio();
+
+            if (e.getButton() == MouseButton.PRIMARY) {
+                if (this.getValor() == INICIO) {
+                    if (anteriorColor == PARED)   setPared();
+                    if (anteriorColor == LLEGADA) setLlegada();
+                    if (anteriorColor == ABIERTO) setAbierto();
+                }
+                else {
+                    anteriorColor = this.getValor();
+                    this.setInicio();
+                }
             }
+
         });
         this.setOnMouseEntered(e -> {
             if (e.isShiftDown()) {
