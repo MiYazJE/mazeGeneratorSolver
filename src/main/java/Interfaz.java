@@ -43,6 +43,7 @@ public class Interfaz extends Application {
         cargarPropiedades();
 
         laberinto = new Maze2d();
+        this.thread = new Thread(laberinto);
         pane = new BorderPane();
         pane.setCenter(laberinto);
 
@@ -116,13 +117,9 @@ public class Interfaz extends Application {
         });
 
         btnCrearLaberinto.setOnAction(e -> {
-            if (this.thread.isAlive()) {
-                this.thread.stop();
-                this.laberinto.generarLaberinto();
-            }
-            if (!this.thread.isAlive()) {
-                this.laberinto.generarLaberinto();
-            }
+            thread.stop();
+            this.laberinto.generarLaberinto();
+            thread = new Thread(laberinto);
         });
 
         btnEmpezar.setOnAction(e -> {

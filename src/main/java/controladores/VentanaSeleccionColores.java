@@ -1,6 +1,7 @@
 package controladores;
 
 import com.jfoenix.controls.JFXButton;
+import com.jfoenix.controls.JFXCheckBox;
 import com.jfoenix.controls.JFXColorPicker;
 import com.jfoenix.controls.JFXTextField;
 import javafx.fxml.FXML;
@@ -13,6 +14,8 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.util.Duration;
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.PropertiesConfiguration;
 import utils.Propiedades;
 
 import java.io.File;
@@ -34,7 +37,7 @@ public class VentanaSeleccionColores extends AnchorPane implements Initializable
     @FXML private JFXButton btnAplicar;
     @FXML private JFXTextField fieldDimension;
     @FXML private ImageView imgQuestion;
-    @FXML private AnchorPane root;
+    @FXML private JFXCheckBox checkModo;
 
     private Map<String, String> conf;
     private Parent parent;
@@ -46,6 +49,9 @@ public class VentanaSeleccionColores extends AnchorPane implements Initializable
         cargarValores();
     }
 
+    /**
+     * Propiedades de la vista.
+     */
     private void init() {
         try {
             FXMLLoader loader = new FXMLLoader();
@@ -78,6 +84,11 @@ public class VentanaSeleccionColores extends AnchorPane implements Initializable
 
     }
 
+    /**
+     * Añade un evento al componente pasado como parámetro para que cuándo
+     * se escriban carácteres que no sean números sean eliminados.
+     * @param field
+     */
     private void fieldSoloNumeros(JFXTextField field) {
         field.textProperty().addListener((o, oldVal, newVal) -> {
             if (!newVal.matches("\\d*")) {
@@ -86,6 +97,10 @@ public class VentanaSeleccionColores extends AnchorPane implements Initializable
         });
     }
 
+    /**
+     * Al iniciar la ventana carga todos los componentes con los valores guardados
+     * en el archivo propiedades.properties
+     */
     private void cargarValores() {
         this.colorAbierto.setValue(Color.valueOf(conf.get("ABIERTO")));
         this.colorBacktrack.setValue(Color.valueOf(conf.get("VISITADO")));
@@ -93,38 +108,45 @@ public class VentanaSeleccionColores extends AnchorPane implements Initializable
         this.colorFin.setValue(Color.valueOf(conf.get("LLEGADA")));
         this.colorRecorrido.setValue(Color.valueOf(conf.get("ACTUAL")));
         this.fieldDimension.setText(conf.get("DIMENSION"));
+        this.checkModo.setSelected( conf.get("MODO").equals("PINTAR") );
     }
 
+    /**
+     * Guarda todos los cambios realizados en el fichero propiedades.properties
+     * @return boolean
+     */
     private boolean guardarConfiguracion() {
-
-        Properties p = new Properties();
 
         try {
 
             File file = new File("propiedades.properties");
-            FileInputStream fis = new FileInputStream(file);
-            p.load(fis);
+            PropertiesConfiguration p = new PropertiesConfiguration(file.getAbsolutePath());
 
             p.setProperty("ABIERTO", this.colorAbierto.getValue().toString());
             p.setProperty("PARED", this.colorPared.getValue().toString());
             p.setProperty("VISITADO", this.colorBacktrack.getValue().toString());
             p.setProperty("LLEGADA", this.colorFin.getValue().toString());
             p.setProperty("ACTUAL", this.colorRecorrido.getValue().toString());
+
             // Las dimensiones del laberinto solo pueden ser impares,
-            // el algoritmo de creación de laberintos lo requiere (autoOfBonds)
+            // el algoritmo de creación de laberintos lo requiere *indexAutoOfBonds*
             int dimension = Integer.valueOf(this.fieldDimension.getText());
             dimension = (dimension %2 == 0) ? dimension+1 : dimension;
             p.setProperty("DIMENSION", String.valueOf(dimension));
-            p.store(new FileWriter(file.getAbsolutePath()), "Actualiando configuración");
+
+            String modo = (this.checkModo.isSelected()) ? "PINTAR" : "LABERINTO";
+            p.setProperty("MODO", modo);
+
+            p.save();
 
             return true;
 
-        } catch (IOException e) {
+        } catch (ConfigurationException e) {
             System.out.println(e.getMessage());
             System.out.println(e.getClass().getName());
-            return false;
         }
 
+        return false;
     }
 
 }

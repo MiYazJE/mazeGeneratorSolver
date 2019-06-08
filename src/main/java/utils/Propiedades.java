@@ -13,6 +13,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+
+/**
+ * Esta clase es la encargada de leer y escribir valores utilizados
+ * en el programa, como por ejemplo:
+ *  -Los colores de las diferentes tipos de celdas.ç
+ *  -La velocidad.
+ *  -El modo seleccionado (dibujar, laberinto).
+ */
 public class Propiedades {
 
     private String rutaAbsoluta;
@@ -113,6 +121,11 @@ public class Propiedades {
         } catch (ConfigurationException e) {}
     }
 
+    /**
+     * Obtiene el valor de la propiedad que se le pase como parámetro.
+     * @param propiedad : String del nombre de la llave
+     * @return String : valor de la propiedad
+     */
     public String obtenerPropiedad(String propiedad) {
         try {
             FileInputStream file = new FileInputStream(new File("propiedades.properties"));

@@ -35,7 +35,7 @@ public class Maze2d extends VBox implements Runnable, EstadoCeldas {
     private Long velocidad;
     private Jugador player;
     private GenerarLaberinto gen;
-    public static HashMap<String, String> conf;
+    private HashMap<String, String> conf;
     private Propiedades propiedades;
 
     public Maze2d() {
@@ -140,7 +140,7 @@ public class Maze2d extends VBox implements Runnable, EstadoCeldas {
         for (int i = 0; i < dimension; i++) {
             HBox fila = new HBox();
             for (int j = 0; j < dimension; j++) {
-                Celda celda = new Celda(i, j, maze[i][j], sizeCelda);
+                Celda celda = new Celda(i, j, 1, sizeCelda);
                 laberinto[i][j] = celda;
                 fila.getChildren().add(celda);
             }
@@ -190,8 +190,10 @@ public class Maze2d extends VBox implements Runnable, EstadoCeldas {
 
     @Override
     public void run() {
+        ruta.clear();
+        conf = Propiedades.cargarPropiedades();
         resolver(1, 1);
-        imprimir();
+        // imprimir();
         marcarRuta();
     }
 
@@ -203,7 +205,7 @@ public class Maze2d extends VBox implements Runnable, EstadoCeldas {
 
         if (!fuera(i, j) && laberinto[i][j].estaAbierta()) {
 
-            ruta.push( i + " " + j);
+            ruta.push( String.valueOf(i).concat(" ").concat(String.valueOf(j)) );
             laberinto[i][j].pintarCelda("ACTUAL");
             laberinto[i][j].setActual();
 
@@ -216,13 +218,14 @@ public class Maze2d extends VBox implements Runnable, EstadoCeldas {
                 } catch (InterruptedException e) { }
             }
 
-            if ( resolver(i-1, j) ||
-                 resolver(i+1, j) ||
-                 resolver(i, j-1) ||
-                 resolver(i, j+1) )
+
+            if (resolver(i - 1, j) ||
+                    resolver(i + 1, j) ||
+                    resolver(i, j - 1) ||
+                    resolver(i, j + 1))
                 return true;
 
-            ruta.pop();
+            if (!ruta.isEmpty()) ruta.pop();
             laberinto[i][j].pintarCelda("VISITADO");
             laberinto[i][j].setVisitado();
 
