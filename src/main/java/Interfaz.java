@@ -1,5 +1,7 @@
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXSlider;
+import controladores.VentanaModoUso;
+import controladores.VentanaSeleccionColores;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -29,6 +31,8 @@ public class Interfaz extends Application {
     private Propiedades propiedades;
     private VBox cajaComponentes;
     private JFXButton btnLimpiar;
+    private JFXButton btnModoUso;
+    private JFXButton btnCreditos;
 
 
     @Override
@@ -42,7 +46,13 @@ public class Interfaz extends Application {
         pane.setCenter(laberinto);
 
         btnConfiguracion = new JFXButton("CONFIGURACIÓN");
-        btnConfiguracion.getStyleClass().add("btn-configuracion");
+        btnConfiguracion.getStyleClass().add("btn-bottomPanel");
+
+        btnModoUso = new JFXButton("MODO USO");
+        btnModoUso.getStyleClass().add("btn-bottomPanel");
+
+        btnCreditos = new JFXButton("CREDITOS");
+        btnCreditos.getStyleClass().add("btn-bottomPanel");
 
         btnCrearLaberinto = new JFXButton("Crear laberinto");
         btnCrearLaberinto.getStyleClass().add("btn-rightPanel");
@@ -67,8 +77,14 @@ public class Interfaz extends Application {
 
         contenedorLeft = new BorderPane();
         contenedorLeft.setCenter(cajaComponentes);
-        contenedorLeft.setBottom(btnConfiguracion);
+
+        VBox cajaBottom = new VBox(btnConfiguracion, btnModoUso, btnCreditos);
+        cajaBottom.setAlignment(Pos.CENTER);
+        cajaBottom.setSpacing(20);
+
+        contenedorLeft.setBottom(cajaBottom);
         BorderPane.setMargin(btnConfiguracion, new Insets(0, 60, 50, 70));
+        BorderPane.setMargin(cajaBottom, new Insets(0, 0, 40, 0));
         propiedadesContenedorLeft();
         aplicarMargenes();
 
@@ -81,12 +97,18 @@ public class Interfaz extends Application {
         scene.getStylesheets().add("estilos.css");
 
         ventana.setScene(scene);
-        ventana.setTitle("Laberinto");
+        ventana.setTitle("El Laberinto");
+        ventana.getIcons().add(new Image("/imagenes/iconMaze.png"));
         ventana.setResizable(false);
         ventana.show();
 
     }
 
+    /**
+     * Inicializa el objeto propiedades y lanza el método crearPropiedades
+     * para que en caso de no existir el fichero .properties este sea
+     * credo con las opciones predeterminadas.
+     */
     private void cargarPropiedades() {
         propiedades = new Propiedades();
         propiedades.crearPropiedades();
@@ -137,7 +159,12 @@ public class Interfaz extends Application {
             }
         });
 
+        /*
+        EVENTOS BOTONES Panel Bottom
+         */
         btnConfiguracion.setOnAction(e -> lanzarVentanaConfiguracion());
+        btnModoUso.setOnAction(e -> lanzarVentanaModoUso());
+        btnCreditos.setOnAction(e -> lanzarVentanaCreditos());
 
     }
 
@@ -165,7 +192,23 @@ public class Interfaz extends Application {
      * Muestra un mensaje con un efecto.
      */
     private void lanzarVentanaConfiguracion() {
-        Mensaje.mostrar(contenedorGlobal);
+        VentanaSeleccionColores ventana = new VentanaSeleccionColores();
+        Mensaje.mostrar(contenedorGlobal, ventana);
+    }
+
+    /**
+     * Lanza una ventana mostrando los modos de uso del programa
+     */
+    private void lanzarVentanaModoUso() {
+        VentanaModoUso ventana = new VentanaModoUso();
+        Mensaje.mostrar(contenedorGlobal, ventana);
+    }
+
+    /**
+     * Lanaza y muestra una ventana con los creditos del programa.
+     */
+    private void lanzarVentanaCreditos() {
+        Mensaje.mostrarCreditos(contenedorGlobal);
     }
 
     public static void main(String[] args) {

@@ -107,30 +107,48 @@ public class Celda extends Rectangle implements EstadoCeldas {
         });
     }
 
+    /**
+     * Pinta la celda y cambia su valor a ABIERTO
+     */
     public void setAbierto() {
         this.valor = ABIERTO;
         pintarCelda("ABIERTO");
     }
 
+    /**
+     * Pinta la celda y cambia su valor a ABIERTO
+     */
     public void setPared() {
         this.valor = PARED;
         pintarCelda("PARED");
     }
 
+    /**
+     * Cambia su valor a LLEGADA
+     */
     public void setEnd() {
         this.valor = LLEGADA;
     }
 
+    /**
+     * Pinta la celda y cambia su valor a ACTUAL
+     */
     public void setActual() {
         this.valor = ACTUAL;
         pintarCelda("ACTUAL");
     }
 
+    /**
+     * Pinta la celda y cambia su valor a INICIO
+     */
     public void setInicio() {
         this.valor = INICIO;
         pintarCelda("INICIO");
     }
 
+    /**
+     * Pinta la celda y cambia su valor a LLEGADA
+     */
     public void setLlegada() {
         this.valor = LLEGADA;
         pintarCelda("LLEGADA");

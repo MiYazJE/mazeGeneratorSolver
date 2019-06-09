@@ -26,6 +26,10 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.ResourceBundle;
 
+/**
+ * Esta clase crea y muestra componentes para el cambio de configuración de
+ * propiedades del programa.
+ */
 public class VentanaSeleccionColores extends AnchorPane implements Initializable  {
 
     @FXML private JFXColorPicker colorAbierto;
@@ -46,6 +50,10 @@ public class VentanaSeleccionColores extends AnchorPane implements Initializable
     private Map<String, String> conf;
     private Parent parent;
 
+    /**
+     * Contructor con 0 parámetros que inicializa la ventana y carga todos los componentes
+     * con los valores recogidos del archivo .properties
+     */
     public VentanaSeleccionColores() {
         init();
         getChildren().add(parent);
@@ -86,6 +94,11 @@ public class VentanaSeleccionColores extends AnchorPane implements Initializable
 
     }
 
+    /**
+     * Inserta un tooltip en la imágen pasada como parámetro
+     * indicando un mensaje de ayuda.
+     * @param imagen
+     */
     private void insertarToolTip(ImageView imagen) {
         Tooltip tooltip = new Tooltip("Debe ser un número entero.");
         tooltip.setFont(new Font("Quicksand", 14));

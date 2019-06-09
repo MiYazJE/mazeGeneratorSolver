@@ -18,13 +18,28 @@
     -fx-text-fill: white;
 }
 
+.textoModoUso {
+    -fx-font-size: 20px;
+    -fx-text-fill: black;
+}
+
 .seleccion-color {
     -fx-text-fill: white;
     -fx-font-size: 17px;
 }
 
-.btn-configuracion {
+.btn-bottomPanel {
     -fx-text-fill: white;
     -fx-font-size: 15px;
     -fx-cursor: HAND;
+}
+
+.btnCreditos {
+    -fx-font-size: 15px;
+    -fx-cursor: HAND;
+}
+
+.labelCreditos {
+    -fx-font-size: 15px;
+    -fx-text-fill: black;
 }
