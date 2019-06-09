@@ -33,7 +33,7 @@ public class Propiedades {
             "VUELTA",    "FF0000",
             "INICIO",    "#0087FF",
             "DIMENSION", "31",
-            "MODO",      "PINTAR",
+            "MODO",      "LABERINTO",
             "VELOCIDAD", "50",
             "ALGORITMO", "DFS"
     );
