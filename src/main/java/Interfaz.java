@@ -1,7 +1,5 @@
 import com.jfoenix.controls.JFXButton;
-import com.jfoenix.controls.JFXCheckBox;
 import com.jfoenix.controls.JFXSlider;
-import controladores.VentanaSeleccionColores;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -9,40 +7,36 @@ import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.layout.*;
-import javafx.scene.text.Text;
 import javafx.stage.Stage;
-import laberinto.Maze2d;
+import laberinto.Grid;
 import utils.Propiedades;
 import utils.Mensaje;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
 
 public class Interfaz extends Application {
 
-    StackPane contenedorGlobal;
-    BorderPane contenedorLeft;
-    JFXButton btnCrearLaberinto;
-    JFXButton btnEmpezar;
-    JFXButton btnConfiguracion;
-    Maze2d laberinto;
-    BorderPane pane;
-    Thread thread;
-    JFXSlider slider;
-    Label velocidad;
-    Propiedades propiedades;
-    VBox cajaComponentes;
+    private StackPane contenedorGlobal;
+    private  BorderPane contenedorLeft;
+    private JFXButton btnCrearLaberinto;
+    private JFXButton btnEmpezar;
+    private JFXButton btnConfiguracion;
+    private Grid laberinto;
+    private  BorderPane pane;
+    private Thread thread;
+    private JFXSlider slider;
+    private Label velocidad;
+    private Propiedades propiedades;
+    private VBox cajaComponentes;
+    private JFXButton btnLimpiar;
+
 
     @Override
     public void start(Stage ventana) throws IOException {
 
         cargarPropiedades();
 
-        laberinto = new Maze2d();
+        laberinto = new Grid();
         this.thread = new Thread(laberinto);
         pane = new BorderPane();
         pane.setCenter(laberinto);
@@ -59,9 +53,12 @@ public class Interfaz extends Application {
         VBox cajaSlider = new VBox();
         slider = new JFXSlider();
         propiedadesSlider();
-        velocidad = new Label("Velocidad " + slider.getValue());
-        cajaSlider.getChildren().addAll(slider, velocidad);
+        velocidad = new Label("Milisegundos " + slider.getValue());
+        btnLimpiar = new JFXButton("Limpiar");
+        btnLimpiar.getStyleClass().add("btn-limpiar");
+        cajaSlider.getChildren().addAll(slider, velocidad, btnLimpiar);
         cajaSlider.setAlignment(Pos.TOP_CENTER);
+        VBox.setMargin(btnLimpiar, new Insets(20,0, 0, 0));
 
         cajaComponentes = new VBox();
         propiedadesComponentes();
@@ -108,12 +105,23 @@ public class Interfaz extends Application {
         BorderPane.setMargin(cajaComponentes, new Insets(40, 40, 40 ,40));
     }
 
+    /**
+     * Creación de los eventos utilizados en la interfaz.
+     */
     private void crearEventos() {
 
         slider.valueProperty().addListener((o, oldValue, newValue) -> {
-            this.velocidad.setText("Velocidad: " + (int)slider.getValue());
+            this.velocidad.setText("Milisegundos: " + (int)slider.getValue());
             int num = Double.valueOf(slider.getValue()).intValue();
             propiedades.almacenarVelocidad(String.valueOf(num));
+        });
+
+        btnLimpiar.setOnAction(e -> {
+            if (!thread.isAlive())
+                if (propiedades.obtenerPropiedad("MODO").equals("PINTAR"))
+                    laberinto.crearTodoAbierto();
+                else
+                    laberinto.limpiarLaberinto();
         });
 
         btnCrearLaberinto.setOnAction(e -> {
@@ -133,12 +141,18 @@ public class Interfaz extends Application {
 
     }
 
+    /**
+     * Margenes utilizados en el contenedorLeft para sus componentes hijos
+     */
     private void aplicarMargenes() {
         BorderPane.setMargin(btnCrearLaberinto, new Insets(50, 30, 30, 30));
         BorderPane.setMargin(slider, new Insets(30, 30, 30, 30));
         BorderPane.setMargin(btnEmpezar, new Insets(5, 30, 30, 30));
     }
 
+    /**
+     * Propiedades del componente slider
+     */
     private void propiedadesSlider() {
         slider.setMaxWidth(150);
         Integer valorSlider = Integer.valueOf(propiedades.obtenerPropiedad("VELOCIDAD"));
@@ -147,6 +161,9 @@ public class Interfaz extends Application {
         slider.setMax(150);
     }
 
+    /**
+     * Muestra un mensaje con un efecto.
+     */
     private void lanzarVentanaConfiguracion() {
         Mensaje.mostrar(contenedorGlobal);
     }

@@ -1,17 +1,12 @@
 package Celda;
 
-import javafx.event.EventHandler;
 import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
-import laberinto.Maze2d;
 import utils.Propiedades;
 
-import java.util.HashMap;
-
 /**
- * Esta clase representa una Celda del Laberinto.
+ * Esta clase representa una Celda en una cuadricula.
  */
 public class Celda extends Rectangle implements EstadoCeldas {
 
@@ -28,7 +23,6 @@ public class Celda extends Rectangle implements EstadoCeldas {
         this.valor = estado;
         p = new Propiedades();
         aplicarEstilo(estado);
-        //if (p.obtenerPropiedad("MODO").equals("PINTAR")) aplicarEventos();
         aplicarEventos();
     }
 
@@ -57,7 +51,7 @@ public class Celda extends Rectangle implements EstadoCeldas {
      * Colorea el fondo de este objeto Rectangle con el color
      * que se le pase como argumento.
      * Ej: Si se le pasa "ABIERTO", leera la propiedad llamada
-     * "ABIERTO" del fichero .properties y este le devolvera un
+     * "ABIERTO" del fichero .properties c este le devolvera un
      * String con el codigo del color.
      * <p>
      * IMPORTANTE! Devuelve un String vacio si la propiedad no
@@ -70,10 +64,10 @@ public class Celda extends Rectangle implements EstadoCeldas {
 
     /**
      * Se añaden los siguientes eventos:
-     *  -Click izquierdo: pinta la celda del tipo "ABIERTO"
-     *  -Click derecho: pinta la celda del tipo "PARED"
-     *  -Drag con el Shift: pinta la celda del tipo "ABIERTO"
-     *  -Drag con el altIzquierdo: pinta la celda del tipo "PARED"
+     *  -Click izquierdo: cambia el estado de la celda a INICIO
+     *  -Click derecho: cambia el estado de la celda a FIN
+     *  -Drag con el Shift: cambia el estado de la celda a ABIERTO
+     *  -Drag con el altIzquierdo: cambia el estado de la celda a PARED
      */
     private void aplicarEventos() {
         this.setOnMouseClicked(e -> {

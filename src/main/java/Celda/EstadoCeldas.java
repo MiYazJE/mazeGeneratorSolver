@@ -3,6 +3,9 @@
  */
 package Celda;
 
+/**
+ * Interfaz que contiene las constantes de los diferentes estados de las celdas.
+ */
 public interface EstadoCeldas {
 
     public final static int ACTUAL   = -1;

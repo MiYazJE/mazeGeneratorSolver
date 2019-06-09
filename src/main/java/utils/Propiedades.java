@@ -15,7 +15,7 @@ import java.util.Properties;
 
 
 /**
- * Esta clase es la encargada de leer y escribir valores utilizados
+ * Esta clase es la encargada de leer c escribir valores utilizados
  * en el programa, como por ejemplo:
  *  -Los colores de las diferentes tipos de celdas.ç
  *  -La velocidad.
@@ -34,10 +34,14 @@ public class Propiedades {
             "INICIO",    "#0087FF",
             "DIMENSION", "31",
             "MODO",      "PINTAR",
-            "VELOCIDAD", "50"
+            "VELOCIDAD", "50",
+            "ALGORITMO", "DFS"
     );
     private Properties propiedades;
 
+    /**
+     * Constructor del objeto Propiedades.
+     */
     public Propiedades() {
         this.archivo = new File("propiedades.properties");
         this.rutaAbsoluta = archivo.getAbsolutePath();
@@ -98,15 +102,16 @@ public class Propiedades {
         try {
             FileInputStream file = new FileInputStream(new File("propiedades.properties"));
             p.load(file);
-            conf.put("ABIERTO", p.getProperty("ABIERTO"));
-            conf.put("INICIO", p.getProperty("INICIO"));
-            conf.put("VUELTA", p.getProperty("VUELTA"));
-            conf.put("PARED", p.getProperty("PARED"));
-            conf.put("LLEGADA", p.getProperty("LLEGADA"));
-            conf.put("ACTUAL", p.getProperty("ACTUAL"));
+            conf.put("ABIERTO",   p.getProperty("ABIERTO"));
+            conf.put("INICIO",    p.getProperty("INICIO"));
+            conf.put("VUELTA",    p.getProperty("VUELTA"));
+            conf.put("PARED",     p.getProperty("PARED"));
+            conf.put("LLEGADA",   p.getProperty("LLEGADA"));
+            conf.put("ACTUAL",    p.getProperty("ACTUAL"));
             conf.put("DIMENSION", p.getProperty("DIMENSION"));
-            conf.put("MODO", p.getProperty("MODO"));
+            conf.put("MODO",      p.getProperty("MODO"));
             conf.put("VELOCIDAD", p.getProperty("VELOCIDAD"));
+            conf.put("ALGORITMO", p.getProperty("ALGORITMO"));
         } catch (IOException e) {
             System.out.println(e.getMessage());
             System.out.println(e.getClass().getName());
@@ -132,7 +137,7 @@ public class Propiedades {
         try {
             FileInputStream file = new FileInputStream(new File("propiedades.properties"));
             propiedades.load(file);
-            return propiedades.getProperty(propiedad);
+            return propiedades.getProperty( propiedad );
         } catch (IOException e) {
             System.out.println(e.getMessage());
             System.out.println(e.getClass().getName());

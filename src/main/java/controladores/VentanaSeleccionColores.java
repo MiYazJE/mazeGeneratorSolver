@@ -1,9 +1,8 @@
 package controladores;
 
-import com.jfoenix.controls.JFXButton;
-import com.jfoenix.controls.JFXCheckBox;
-import com.jfoenix.controls.JFXColorPicker;
-import com.jfoenix.controls.JFXTextField;
+import com.jfoenix.controls.*;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -11,16 +10,19 @@ import javafx.scene.Parent;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.util.Duration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
+import utils.Mensaje;
 import utils.Propiedades;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.ResourceBundle;
 
@@ -36,6 +38,10 @@ public class VentanaSeleccionColores extends AnchorPane implements Initializable
     @FXML private JFXTextField fieldDimension;
     @FXML private ImageView imgQuestion;
     @FXML private JFXCheckBox checkModo;
+    @FXML private JFXComboBox<String> comboAlgoritmo;
+
+    private ObservableList<String> algoritmos = FXCollections.observableArrayList(
+            Arrays.asList("DFS", "Random Recursive"));
 
     private Map<String, String> conf;
     private Parent parent;
@@ -65,11 +71,17 @@ public class VentanaSeleccionColores extends AnchorPane implements Initializable
     @Override
     public void initialize(URL location, ResourceBundle resources) {
 
+        this.comboAlgoritmo.setItems( algoritmos );
+
         insertarToolTip(this.imgQuestion);
         fieldSoloNumeros(this.fieldDimension);
 
         btnAplicar.setOnAction(e -> {
-            guardarConfiguracion();
+            StackPane root = (StackPane) parent.getScene().getRoot();
+            if (guardarConfiguracion())
+                Mensaje.mostrarNotificacion(root, 0);
+            else
+                Mensaje.mostrarNotificacion(root, 1);
         });
 
     }
@@ -108,6 +120,7 @@ public class VentanaSeleccionColores extends AnchorPane implements Initializable
         this.colorLlegada.setValue(Color.valueOf(conf.get("LLEGADA")));
         this.fieldDimension.setText(conf.get("DIMENSION"));
         this.checkModo.setSelected( conf.get("MODO").equals("PINTAR") );
+        this.comboAlgoritmo.setValue(conf.get("ALGORITMO"));
     }
 
     /**
@@ -121,10 +134,13 @@ public class VentanaSeleccionColores extends AnchorPane implements Initializable
             File file = new File("propiedades.properties");
             PropertiesConfiguration p = new PropertiesConfiguration(file.getAbsolutePath());
 
-            p.setProperty("ABIERTO", this.colorAbierto.getValue().toString());
-            p.setProperty("PARED", this.colorPared.getValue().toString());
-            p.setProperty("VUELTA", this.colorVueltaFin.getValue().toString());
-            p.setProperty("ACTUAL", this.colorRecorrido.getValue().toString());
+            p.setProperty("ABIERTO",   this.colorAbierto.getValue().toString());
+            p.setProperty("PARED",     this.colorPared.getValue().toString());
+            p.setProperty("VUELTA",    this.colorVueltaFin.getValue().toString());
+            p.setProperty("ACTUAL",    this.colorRecorrido.getValue().toString());
+            p.setProperty("LLEGADA",   this.colorLlegada.getValue().toString());
+            p.setProperty("INICIO",    this.colorInicio.getValue().toString());
+            p.setProperty("ALGORITMO", this.comboAlgoritmo.getValue());
 
             // Las dimensiones del laberinto solo pueden ser impares,
             // el algoritmo de creación de laberintos lo requiere *indexAutoOfBonds*

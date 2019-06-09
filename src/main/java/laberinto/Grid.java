@@ -5,6 +5,8 @@ package laberinto;
 
 import Celda.*;
 import Generador.GenerarLaberinto;
+import Generador.MakeMazeDfs;
+import javafx.application.Platform;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -13,7 +15,7 @@ import utils.Propiedades;
 import java.util.HashMap;
 import java.util.Stack;
 
-public class Maze2d extends VBox implements Runnable, EstadoCeldas {
+public class Grid extends VBox implements Runnable, EstadoCeldas {
 
     private int[][] maze;
     // Almacena cada una de las celdas generadas en el laberinto
@@ -26,24 +28,24 @@ public class Maze2d extends VBox implements Runnable, EstadoCeldas {
     private Propiedades propiedades;
     private int inicioX;
     private int inicioY;
+    private MakeMazeDfs genDFS;
 
-    public Maze2d() {
+    public Grid() {
 
         propiedades = new Propiedades();
         this.gen = new GenerarLaberinto();
+        genDFS = new MakeMazeDfs();
         generarLaberinto();
 
-        //MakeMazeDfs make = new MakeMazeDfs(dimension);
-        //this.maze = make.getLaberinto();
     }
 
     /**
-     * Método que crea un laberinto y muestra un laberinto de la siguiente forma:
-     *  1.- Creámos un componente HBOX.
-     *  2.- Creámos una Celda y la introducimos en el HBOX.
-     *  3.- Introducimos dentro de el objeto VBOX que estamos heredando el HBOX
-     *      con todas las celdas de una fila de la matriz.
-     *  4.- Repetimos este proceso hasta que no queden mas filas por recorrer.
+     * Método que crea un laberinto c muestra un laberinto de la siguiente forma:
+     * 1.- Creámos un componente HBOX.
+     * 2.- Creámos una Celda c la introducimos en el HBOX.
+     * 3.- Introducimos dentro de el objeto VBOX que estamos heredando el HBOX
+     * con todas las celdas de una fila de la matriz.
+     * 4.- Repetimos este proceso hasta que no queden mas filas por recorrer.
      */
     private void pintarLaberinto() {
         getChildren().clear();
@@ -58,9 +60,30 @@ public class Maze2d extends VBox implements Runnable, EstadoCeldas {
         }
     }
 
+    /**
+     * Cambia el estado de todas las celdasa ABIERTO
+     */
+    public void crearTodoAbierto() {
+        for (int i = 0; i < dimension; i++) {
+            for (int j = 0; j < dimension; j++) {
+                laberinto[i][j].setAbierto();
+            }
+        }
+    }
+
+    /**
+     * Cambia el estado de todas las celdas que no sean Pared a Abierto.
+     */
+    public void limpiarLaberinto() {
+        for (int i = 0; i < dimension; i++)
+            for (int j = 0; j < dimension; j++)
+                if (laberinto[i][j].getValor() != PARED)
+                    laberinto[i][j].setAbierto();
+    }
+
     private void cargarDimensiones() {
         this.dimension = Integer.parseInt(conf.get("DIMENSION"));
-        this.sizeCelda = 1000 / dimension;
+        this.sizeCelda = 850 / dimension;
         this.maze = new int[dimension][dimension];
         this.laberinto = new Celda[dimension][dimension];
     }
@@ -69,8 +92,14 @@ public class Maze2d extends VBox implements Runnable, EstadoCeldas {
         conf = Propiedades.cargarPropiedades();
         cargarDimensiones();
         if (!conf.get("MODO").equals("PINTAR")) {
-            this.gen.crearLaberinto(this.dimension);
-            this.maze = gen.getLaberinto();
+            if (conf.get("ALGORITMO").equals("DFS")) {
+                genDFS.crearLaberinto(dimension);
+                maze = genDFS.getLaberinto();
+            }
+            else {
+                gen.crearLaberinto(dimension);
+                maze = gen.getLaberinto();
+            }
         }
         pintarLaberinto();
     }
@@ -81,6 +110,7 @@ public class Maze2d extends VBox implements Runnable, EstadoCeldas {
 
     @Override
     public void run() {
+        inicioX = 1; inicioY = 1;
         buscarInicio();
         resolver(inicioY, inicioX);
         marcarRuta();
@@ -93,7 +123,8 @@ public class Maze2d extends VBox implements Runnable, EstadoCeldas {
                 if (laberinto[i][j].isStart()) {
                     this.inicioY = laberinto[i][j].getFila();
                     this.inicioX = laberinto[i][j].getColumna();
-                    salir = true; break;
+                    salir = true;
+                    break;
                 }
             }
             if (salir) break;
@@ -104,6 +135,14 @@ public class Maze2d extends VBox implements Runnable, EstadoCeldas {
         return (f < 0 || c < 0 || f >= dimension || c >= dimension);
     }
 
+    /**
+     * Comprueba si la celda es valida si su estado es:
+     *  - ABIERTO
+     *  - INICIO
+     *  - FINAL
+     * @param celda
+     * @return
+     */
     private boolean isValid(Celda celda) {
         return celda.isOpen() || celda.isStart() || celda.isEnd();
     }
@@ -112,7 +151,7 @@ public class Maze2d extends VBox implements Runnable, EstadoCeldas {
 
         if (!fuera(i, j) && isValid(laberinto[i][j])) {
 
-            ruta.push( i + " " + j );
+            ruta.push(i + " " + j);
 
             if (laberinto[i][j].isOpen())
                 laberinto[i][j].setActual();
@@ -123,7 +162,8 @@ public class Maze2d extends VBox implements Runnable, EstadoCeldas {
             synchronized (this) {
                 try {
                     wait(leerVelocidad());
-                } catch (InterruptedException e) { }
+                } catch (InterruptedException e) {
+                }
             }
 
             if (resolver(i - 1, j) ||
@@ -148,6 +188,13 @@ public class Maze2d extends VBox implements Runnable, EstadoCeldas {
         return false;
     }
 
+    /**
+     * Pinta las celdas del color de "VUELTA" utilizando
+     * una lista con las coordenadas almacenadas.
+     * A la misma vez que pinta, también reemplaza el valor de las celdas
+     * por el estado ABIERTO. Para que se pueda seguir utilizando el laberinto
+     * sin tener que crear otro.
+     */
     private void marcarRuta() {
 
         Integer f;
@@ -175,19 +222,6 @@ public class Maze2d extends VBox implements Runnable, EstadoCeldas {
 
         }
 
-        // Limpiamos las rutas para la siguiente busqueda
-        ruta.clear();
-        System.out.println("Terminando de imprimir ruta...");
     }
 
-    private void imprimir() {
-        for (int i = 0; i < dimension; i++) {
-            for (int j = 0; j < dimension; j++) {
-                System.out.print((laberinto[i][j].getValor()==ABIERTO)
-                                ? ABIERTO+" " : PARED+" ");
-            }
-            System.out.println();
-        }
-    }
-    
 }

@@ -7,8 +7,7 @@ import Celda.*;
 
 public class GenerarLaberinto implements EstadoCeldas {
 
-    private int filas;
-    private int columnas;
+    private int dim;
     private int[][] maze;
 
     public GenerarLaberinto(  ) {
@@ -16,8 +15,7 @@ public class GenerarLaberinto implements EstadoCeldas {
     }
 
     private void cargarDimensiones( int dim ) {
-        this.filas = dim;
-        this.columnas = dim;
+        this.dim = dim;
         this.maze = new int[dim][dim];
     }
 
@@ -29,23 +27,23 @@ public class GenerarLaberinto implements EstadoCeldas {
         int emptyCt = 0;
         int wallCt = 0;
 
-        int[] wallrow = new int[(filas*columnas)/2];
-        int[] wallcol = new int[(filas*columnas)/2];
+        int[] wallrow = new int[(this.dim * this.dim)/2];
+        int[] wallcol = new int[(this.dim * this.dim)/2];
 
-        for (i = 0; i<filas; i++)
-            for (j = 0; j < columnas; j++)
+        for (i = 0; i < this.dim; i++)
+            for (j = 0; j < this.dim; j++)
                 maze[i][j] = PARED;
 
-        for (i = 1; i<filas-1; i += 2)  {
-            for (j = 1; j<columnas-1; j += 2) {
+        for (i = 1; i< this.dim -1; i += 2)  {
+            for (j = 1; j< this.dim -1; j += 2) {
                 emptyCt++;
                 maze[i][j] = -emptyCt;
-                if (i < filas-2) {
+                if (i < this.dim -2) {
                     wallrow[wallCt] = i+1;
                     wallcol[wallCt] = j;
                     wallCt++;
                 }
-                if (j < columnas-2) {
+                if (j < this.dim -2) {
                     wallrow[wallCt] = i;
                     wallcol[wallCt] = j+1;
                     wallCt++;
@@ -62,8 +60,8 @@ public class GenerarLaberinto implements EstadoCeldas {
         }
 
         // Reemplazar valores negativos por casillas abiertas
-        for (i=1; i<filas-1; i++)
-            for (j=1; j<columnas-1; j++)
+        for (i=1; i< this.dim -1; i++)
+            for (j=1; j< this.dim -1; j++)
                 if (maze[i][j] < 0)
                     maze[i][j] = ABIERTO;
     }
@@ -94,8 +92,8 @@ public class GenerarLaberinto implements EstadoCeldas {
     }
 
     private void imprimir() {
-        for (int i = 0; i < filas; i++) {
-            for (int j = 0; j < columnas; j++) {
+        for (int i = 0; i < dim; i++) {
+            for (int j = 0; j < dim; j++) {
                 System.out.print(maze[i][j] + " ");
             }
             System.out.println();

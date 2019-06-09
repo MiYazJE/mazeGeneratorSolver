@@ -3,6 +3,7 @@
 <?import com.jfoenix.controls.JFXButton?>
 <?import com.jfoenix.controls.JFXCheckBox?>
 <?import com.jfoenix.controls.JFXColorPicker?>
+<?import com.jfoenix.controls.JFXComboBox?>
 <?import com.jfoenix.controls.JFXTextField?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.Cursor?>
@@ -71,9 +72,10 @@
                         <JFXColorPicker fx:id="colorLlegada" />
                      </children>
                   </HBox>
-                  <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
+                  <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="30.0">
                      <children>
                         <JFXCheckBox fx:id="checkModo" text="Modo Dibujar" />
+                        <JFXComboBox fx:id="comboAlgoritmo" focusColor="BLACK" nodeOrientation="LEFT_TO_RIGHT" prefHeight="25.0" prefWidth="158.0" promptText="Selecciona un algoritmo" />
                      </children>
                   </HBox>
                   <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="10.0">

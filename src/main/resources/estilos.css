@@ -7,6 +7,12 @@
     -fx-font-weight: bold;
 }
 
+.btn-limpiar {
+    -fx-font-size: 15px;
+    -fx-cursor: HAND;
+    -fx-text-fill: white;
+}
+
 .label {
     -fx-font-size: 12px;
     -fx-text-fill: white;
