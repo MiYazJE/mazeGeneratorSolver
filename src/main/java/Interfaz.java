@@ -33,6 +33,7 @@ public class Interfaz extends Application {
     private JFXButton btnLimpiar;
     private JFXButton btnModoUso;
     private JFXButton btnCreditos;
+    private VentanaModoUso ventanaModoUso;
 
 
     @Override
@@ -200,8 +201,9 @@ public class Interfaz extends Application {
      * Lanza una ventana mostrando los modos de uso del programa
      */
     private void lanzarVentanaModoUso() {
-        VentanaModoUso ventana = new VentanaModoUso();
-        Mensaje.mostrar(contenedorGlobal, ventana);
+        if (ventanaModoUso == null)
+            ventanaModoUso = new VentanaModoUso();
+        Mensaje.mostrar(contenedorGlobal, ventanaModoUso);
     }
 
     /**
