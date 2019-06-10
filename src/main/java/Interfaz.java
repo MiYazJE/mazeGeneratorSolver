@@ -1,7 +1,7 @@
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXSlider;
 import controladores.VentanaModoUso;
-import controladores.VentanaSeleccionColores;
+import controladores.VentanaConfiguracion;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -33,6 +33,7 @@ public class Interfaz extends Application {
     private JFXButton btnLimpiar;
     private JFXButton btnModoUso;
     private JFXButton btnCreditos;
+    VentanaConfiguracion ventanaConfiguracion;
     private VentanaModoUso ventanaModoUso;
 
 
@@ -93,6 +94,7 @@ public class Interfaz extends Application {
         contenedorGlobal = new StackPane(pane);
 
         crearEventos();
+        creacionVentanas();
 
         Scene scene = new Scene(contenedorGlobal);
         scene.getStylesheets().add("estilos.css");
@@ -189,20 +191,23 @@ public class Interfaz extends Application {
         slider.setMax(150);
     }
 
+    private void creacionVentanas() {
+        ventanaConfiguracion = new VentanaConfiguracion();
+        ventanaModoUso = new VentanaModoUso();
+    }
+
     /**
      * Muestra un mensaje con un efecto.
      */
     private void lanzarVentanaConfiguracion() {
-        VentanaSeleccionColores ventana = new VentanaSeleccionColores();
-        Mensaje.mostrar(contenedorGlobal, ventana);
+        ventanaConfiguracion.cargarValores();
+        Mensaje.mostrar(contenedorGlobal, ventanaConfiguracion);
     }
 
     /**
      * Lanza una ventana mostrando los modos de uso del programa
      */
     private void lanzarVentanaModoUso() {
-        if (ventanaModoUso == null)
-            ventanaModoUso = new VentanaModoUso();
         Mensaje.mostrar(contenedorGlobal, ventanaModoUso);
     }
 

@@ -30,7 +30,7 @@ import java.util.ResourceBundle;
  * Esta clase crea y muestra componentes para el cambio de configuración de
  * propiedades del programa.
  */
-public class VentanaSeleccionColores extends AnchorPane implements Initializable  {
+public class VentanaConfiguracion extends AnchorPane implements Initializable  {
 
     @FXML private JFXColorPicker colorAbierto;
     @FXML private JFXColorPicker colorPared;
@@ -54,7 +54,7 @@ public class VentanaSeleccionColores extends AnchorPane implements Initializable
      * Contructor con 0 parámetros que inicializa la ventana y carga todos los componentes
      * con los valores recogidos del archivo .properties
      */
-    public VentanaSeleccionColores() {
+    public VentanaConfiguracion() {
         init();
         getChildren().add(parent);
         conf = Propiedades.cargarPropiedades();
@@ -124,7 +124,7 @@ public class VentanaSeleccionColores extends AnchorPane implements Initializable
      * Al iniciar la ventana carga todos los componentes con los valores guardados
      * en el archivo propiedades.properties
      */
-    private void cargarValores() {
+    public void cargarValores() {
         this.colorAbierto.setValue(Color.valueOf(conf.get("ABIERTO")));
         this.colorPared.setValue(Color.valueOf(conf.get("PARED")));
         this.colorVueltaFin.setValue(Color.valueOf(conf.get("VUELTA")));

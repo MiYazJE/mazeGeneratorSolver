@@ -3,7 +3,6 @@ package utils;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXDialog;
 import com.jfoenix.controls.JFXDialogLayout;
-import controladores.VentanaSeleccionColores;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.effect.BoxBlur;
