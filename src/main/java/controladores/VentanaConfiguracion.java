@@ -57,7 +57,6 @@ public class VentanaConfiguracion extends AnchorPane implements Initializable  {
     public VentanaConfiguracion() {
         init();
         getChildren().add(parent);
-        conf = Propiedades.cargarPropiedades();
         cargarValores();
     }
 
@@ -125,6 +124,7 @@ public class VentanaConfiguracion extends AnchorPane implements Initializable  {
      * en el archivo propiedades.properties
      */
     public void cargarValores() {
+        this.conf = Propiedades.cargarPropiedades();
         this.colorAbierto.setValue(Color.valueOf(conf.get("ABIERTO")));
         this.colorPared.setValue(Color.valueOf(conf.get("PARED")));
         this.colorVueltaFin.setValue(Color.valueOf(conf.get("VUELTA")));
