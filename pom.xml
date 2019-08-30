@@ -116,7 +116,7 @@
                 <version>1.6.0</version>
                 <configuration>
                     <classpathScope>test</classpathScope>
-                    <mainClass>Launcher</mainClass>
+                    <mainClass>Main.Launcher</mainClass>
                 </configuration>
                 <executions>
                     <execution>
@@ -140,7 +140,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>Launcher</mainClass>
+                            <mainClass>Main.Launcher</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>
@@ -158,7 +158,7 @@
                         <manifest>
                             <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
                             <addClasspath>true</addClasspath>
-                            <mainClass>Launcher</mainClass>
+                            <mainClass>Main.Launcher</mainClass>
                         </manifest>
                         <manifestEntries>
                             <Class-Path>src/main/</Class-Path>
