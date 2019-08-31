@@ -5,6 +5,9 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import utils.Propiedades;
 
+import java.util.Comparator;
+import java.util.Objects;
+
 /**
  * Esta clase representa una Celda en una cuadricula.
  */
@@ -15,6 +18,17 @@ public class Celda extends Rectangle implements EstadoCeldas {
     private int valor;
     private Propiedades p;
     private int anteriorColor;
+
+    public Celda parent;
+    public int Gcost;
+    public int Hcost;
+    public int Fcost;
+    public boolean closed;
+
+    public Celda(int f, int c) {
+        this.fila = f;
+        this.columna = c;
+    }
 
     public Celda(int f, int c, int estado, double size) {
         super(size, size);
@@ -111,6 +125,7 @@ public class Celda extends Rectangle implements EstadoCeldas {
      * Pinta la celda y cambia su valor a ABIERTO
      */
     public void setAbierto() {
+        restart();
         this.valor = ABIERTO;
         pintarCelda("ABIERTO");
     }
@@ -162,6 +177,18 @@ public class Celda extends Rectangle implements EstadoCeldas {
         return this.valor == LLEGADA;
     }
 
+    public boolean isWall() {
+        return this.valor == PARED;
+    }
+
+    public void restart() {
+        this.Gcost = 0;
+        this.Hcost = 0;
+        this.Fcost = 0;
+        this.closed = false;
+        this.parent = null;
+    }
+
     public int getValor() {
         return this.valor;
     }
@@ -181,5 +208,23 @@ public class Celda extends Rectangle implements EstadoCeldas {
     public int getColumna() {
         return columna;
     }
-}
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Celda celda = (Celda) o;
+        return fila == celda.fila &&
+                columna == celda.columna;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(fila, columna);
+    }
+
+    @Override
+    public String toString() {
+        return "fila=" + fila + ", columna=" + columna + ", hcost=" + Hcost + ", gcost=" + Gcost + ", fcost=" + Fcost;
+    }
+}

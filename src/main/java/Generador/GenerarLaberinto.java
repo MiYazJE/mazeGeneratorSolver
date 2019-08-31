@@ -38,15 +38,13 @@ public class GenerarLaberinto implements EstadoCeldas {
             for (j = 1; j< this.dim -1; j += 2) {
                 emptyCt++;
                 maze[i][j] = -emptyCt;
-                if (i < this.dim -2) {
+                if (i < this.dim - 2) {
                     wallrow[wallCt] = i+1;
-                    wallcol[wallCt] = j;
-                    wallCt++;
+                    wallcol[wallCt++] = j;
                 }
-                if (j < this.dim -2) {
+                if (j < this.dim - 2) {
                     wallrow[wallCt] = i;
-                    wallcol[wallCt] = j+1;
-                    wallCt++;
+                    wallcol[wallCt++] = j+1;
                 }
             }
         }

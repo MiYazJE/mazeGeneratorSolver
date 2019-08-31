@@ -12,10 +12,20 @@ import javafx.scene.layout.VBox;
 import utils.Mensaje;
 import utils.Propiedades;
 import Main.Interfaz;
-import java.util.HashMap;
+
+import java.util.*;
 
 public class Grid extends VBox implements Runnable, EstadoCeldas {
 
+    /*private int[][] maze = {
+            {0,0,0,0,0,0,0},
+            {0,1,1,1,1,1,0},
+            {0,1,0,1,0,0,0},
+            {0,1,0,1,0,1,0},
+            {0,0,0,1,0,1,0},
+            {0,1,1,1,1,1,0},
+            {0,0,0,0,0,0,0}
+    };*/
     private int[][] maze;
     // Almacena cada una de las celdas generadas en el laberinto
     private Celda[][] laberinto;
@@ -28,12 +38,17 @@ public class Grid extends VBox implements Runnable, EstadoCeldas {
     private int inicioY;
     private MakeMazeDfs genDFS;
 
-    public Grid() {
+    // Needed for A * search
+    private ArrayList<Celda> parentList;
+    private Celda startNode, endNode;
+    private boolean resuelto;
 
+    public Grid() {
         propiedades = new Propiedades();
         this.gen = new GenerarLaberinto();
         genDFS = new MakeMazeDfs();
         generarLaberinto();
+        parentList = new ArrayList<>();
     }
 
     /**
@@ -74,8 +89,7 @@ public class Grid extends VBox implements Runnable, EstadoCeldas {
     public void limpiarLaberinto() {
         for (int i = 0; i < dimension; i++)
             for (int j = 0; j < dimension; j++)
-                if (laberinto[i][j].getValor() != PARED)
-                    laberinto[i][j].setAbierto();
+                laberinto[i][j].restart();
     }
 
     private void cargarDimensiones() {
@@ -107,12 +121,19 @@ public class Grid extends VBox implements Runnable, EstadoCeldas {
 
     @Override
     public void run() {
-        inicioX = 1; inicioY = 1;
-        if (buscarInicio()) {
-            if (resolver(inicioY, inicioX))
-                System.out.println("El laberinto ha sido resuelto.");
-            else
-                System.out.println("El laberinto no ha sido resuelto.");
+        if (buscarInicioyFinal()) {
+            resuelto = false;
+            parentList = new ArrayList<>();
+            if (resolverAStar(startNode)) {
+                System.out.println( "LABERINTO RESUELTO!" );
+                paintPath(endNode.parent);
+            } else {
+                System.out.println( "LABERINTO NO RESUELTO!" );
+            }
+//            if (resolverDfs(inicioY, inicioX))
+//                System.out.println("El laberinto ha sido resuelto.");
+//            else
+//                System.out.println("El laberinto no ha sido resuelto.");
         } else {
             // Cannot start exception, declare initial point.
             Platform.runLater(() -> {
@@ -122,19 +143,40 @@ public class Grid extends VBox implements Runnable, EstadoCeldas {
         }
     }
 
-    private boolean buscarInicio() {
-        boolean found = false;
-        for (int i = 0; i < dimension && !found; i++) {
-            for (int j = 0; j < dimension && !found; j++) {
+    private void paintPath(Celda node) {
+        System.out.println( node.getFila() + "-" + node.getColumna() );
+
+        if (node.parent != null)
+            laberinto[node.getFila()][node.getColumna()].pintarCelda("VUELTA");
+
+        synchronized (this) {
+            try {
+                wait(leerVelocidad());
+            } catch (InterruptedException e) { }
+        }
+
+        if (node.parent != null) paintPath(node.parent);
+    }
+
+    private boolean buscarInicioyFinal() {
+        boolean inicio = false, end = false;
+        for (int i = 0; i < dimension && (!inicio || !end); i++) {
+            for (int j = 0; j < dimension && (!inicio || !end); j++) {
                 if (laberinto[i][j].isStart()) {
                     this.inicioY = laberinto[i][j].getFila();
                     this.inicioX = laberinto[i][j].getColumna();
-                    found = true;
+                    startNode = laberinto[i][j];
+                    inicio = true;
+                }
+                if (laberinto[i][j].isEnd()) {
+                    this.endNode = laberinto[i][j];
+                    end = true;
                 }
             }
         }
-        return found;
+        return end && inicio;
     }
+
 
     private boolean fuera(int f, int c) {
         return (f < 0 || c < 0 || f >= dimension || c >= dimension);
@@ -152,9 +194,104 @@ public class Grid extends VBox implements Runnable, EstadoCeldas {
         return celda.isOpen() || celda.isStart() || celda.isEnd();
     }
 
-    private boolean resolver(int i, int j) {
+    private boolean resolverAStar(Celda current) {
 
-        boolean resuelto = false;
+        current.closed = true;
+
+        while (true) {
+
+            if (!current.closed) {
+                synchronized (this) {
+                    try {
+                        laberinto[current.getFila()][current.getColumna()].pintarCelda("ACTUAL");
+                        wait(leerVelocidad());
+                    } catch(InterruptedException e) { }
+                }
+            }
+
+            for (int i = current.getFila() - 1; i <= current.getFila() + 1 && !resuelto; i++) {
+                for (int j = current.getColumna() - 1; j <= current.getColumna() + 1 && !resuelto; j++) {
+
+                    // Si el nodo es el mismo que el parent o si es una pared, seguimos...
+                    if (fuera(i, j) || (current.equals(laberinto[i][j])) || laberinto[i][j].isWall()) continue;
+
+                    if (i != current.getFila() && j != current.getColumna()) {
+                        if (pathBlockedDiagonaly(i, j)) continue;
+                    }
+
+                    if (laberinto[i][j].closed) continue;
+
+                    if (laberinto[i][j].equals(endNode)) {
+                        resuelto = true;
+                        endNode.parent = laberinto[current.getFila()][current.getColumna()];
+                    }
+                    else {
+                        laberinto[i][j].closed = true;
+
+                        // Comparar diagonal con el nodo final
+                        if (isDiagonal(i, j, endNode.getFila(), endNode.getColumna())) {
+                            laberinto[i][j].Hcost = current.Hcost + (14 * Math.abs(i - endNode.getFila()));
+                        }
+                        else {
+                            laberinto[i][j].Hcost = current.Hcost + calculateCost(endNode, laberinto[i][j]);
+                        }
+                        // Comparar diagonal con el nodo inicial
+                        if (isDiagonal(i, j, current.getFila(), current.getColumna())) {
+                            laberinto[i][j].Gcost = current.Gcost + 14;
+                        }
+                        else {
+                            laberinto[i][j].Gcost = current.Gcost + calculateCost(current, laberinto[i][j]);
+                        }
+
+                        laberinto[i][j].Fcost = laberinto[i][j].Gcost + laberinto[i][j].Hcost;
+                        laberinto[i][j].parent = current;
+                        parentList.add(laberinto[i][j]);
+
+                        synchronized (this) {
+                            try {
+                                laberinto[i][j].pintarCelda("ACTUAL");
+                                wait(leerVelocidad());
+                            } catch(InterruptedException e) { }
+                        }
+
+                    }
+                }
+            }
+
+            if (parentList.isEmpty() || resuelto) break;
+            current = getLowestNode();
+        }
+
+        return resuelto;
+    }
+
+    private Celda getLowestNode() {
+        parentList.sort(new SortCeldas());
+        return parentList.remove(0);
+    }
+
+    private int calculateCost(Celda target, Celda current) {
+        return 10 * ((Math.abs(target.getFila() - current.getFila()) +
+                    (Math.abs(target.getColumna() - current.getColumna()))));
+    }
+
+    private boolean isDiagonal(int i, int j, int y, int x) {
+        return (Math.abs(i - y) == Math.abs(j - x));
+    }
+
+    /**
+     * Comprueba si el nodo actual esta bloqueado por paredes diagonalmente.
+     * @param i, j
+     * @return
+     */
+    private boolean pathBlockedDiagonaly(int i, int j) {
+        return (!fuera(i+1, j) && laberinto[i+1][j].isWall() && !fuera(i, j+1) && laberinto[i][j+1].isWall())  || // left upper corner
+                (!fuera(i, j-1) && laberinto[i][j-1].isWall() && !fuera(i+1, j) && laberinto[i+1][j].isWall()) || // right upper
+                (!fuera(i-1, j) && laberinto[i-1][j].isWall() && !fuera(i, j+1) && laberinto[i][j+1].isWall()) || // left bottom
+                (!fuera(i-1, j) && laberinto[i-1][j].isWall() && !fuera(i, j-1) && laberinto[i][j-1].isWall());   // right bottom
+    }
+
+    private boolean resolverDfs(int i, int j) {
 
         if (!fuera(i, j) && isValid(laberinto[i][j])) {
 
@@ -170,10 +307,10 @@ public class Grid extends VBox implements Runnable, EstadoCeldas {
                 } catch (InterruptedException e) { }
             }
 
-            if      (resolver(i - 1, j) ||
-                    resolver(i + 1, j) ||
-                    resolver(i, j - 1) ||
-                    resolver(i, j + 1))
+            if      (resolverDfs(i - 1, j) ||
+                    resolverDfs(i + 1, j)  ||
+                    resolverDfs(i, j - 1)  ||
+                    resolverDfs(i, j + 1))
                 resuelto = true;
 
             if (resuelto) {
@@ -191,4 +328,11 @@ public class Grid extends VBox implements Runnable, EstadoCeldas {
         return resuelto;
     }
 
+}
+
+class SortCeldas implements Comparator<Celda> {
+    @Override
+    public int compare(Celda o1, Celda o2) {
+        return o1.Fcost - o2.Fcost;
+    }
 }
