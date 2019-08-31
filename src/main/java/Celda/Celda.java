@@ -19,11 +19,11 @@ public class Celda extends Rectangle implements EstadoCeldas {
     private Propiedades p;
     private int anteriorColor;
 
-    public Celda parent;
-    public int Gcost;
-    public int Hcost;
-    public int Fcost;
-    public boolean closed;
+    public Celda parent; // Puntero al siguiente nodo mas cercano
+    public int Gcost; // Coste de ir de esta celda a la celda inicio
+    public int Hcost; // Coste de ir de esta celda a la celda final
+    public int Fcost; // Suma de los costes G y H
+    public boolean closed; // Representa si los costes de esta celda ya estan calculados.
 
     public Celda(int f, int c) {
         this.fila = f;

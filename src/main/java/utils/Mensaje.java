@@ -60,7 +60,7 @@ public class Mensaje {
         String[] mensajes = {
                 "La configuración ha sido correctamente almacenda.",
                 "Han ocurrido problemas al almacenar la configuración.",
-                "Por favor indique un nodo inicio antes de comenzar."
+                "Por favor indique un nodo inicio y final antes de comenzar."
         };
 
         Text textoMensaje = new Text( mensajes[estado] );

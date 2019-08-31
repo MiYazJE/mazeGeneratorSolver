@@ -136,19 +136,19 @@ public class Grid extends VBox implements Runnable, EstadoCeldas {
 //            else
 //                System.out.println("El laberinto no ha sido resuelto.");
         } else {
-            // Cannot start exception, declare initial point.
+            // Cannot start exception, declare initial and final points.
             Platform.runLater(() -> {
                 Mensaje.mostrarNotificacion(Interfaz.contenedorGlobal, 2);
-                System.out.println("ERROR. Cannot start exception, declare initial point.");
+                System.out.println("ERROR. Cannot start exception, declare initial and final points.");
             });
         }
     }
 
     private void paintPath(Celda node) {
-        System.out.println( node.getFila() + "-" + node.getColumna() );
+        if (node.parent == null) return;
 
-        if (node.parent != null)
-            laberinto[node.getFila()][node.getColumna()].pintarCelda("VUELTA");
+        System.out.println( node.getFila() + "-" + node.getColumna() );
+        laberinto[node.getFila()][node.getColumna()].pintarCelda("VUELTA");
 
         synchronized (this) {
             try {
@@ -156,7 +156,7 @@ public class Grid extends VBox implements Runnable, EstadoCeldas {
             } catch (InterruptedException e) { }
         }
 
-        if (node.parent != null) paintPath(node.parent);
+        paintPath(node.parent);
     }
 
     private boolean buscarInicioyFinal() {
@@ -213,6 +213,9 @@ public class Grid extends VBox implements Runnable, EstadoCeldas {
             for (int i = current.getFila() - 1; i <= current.getFila() + 1 && !resuelto; i++) {
                 for (int j = current.getColumna() - 1; j <= current.getColumna() + 1 && !resuelto; j++) {
 
+                    // Evitar si el nodo se encuentra en cualquier diagonal
+                    // if (isDiagonal(i, j, current.getFila(), current.getColumna())) continue;
+
                     // Si el nodo es el mismo que el parent o si es una pared, seguimos...
                     if (fuera(i, j) || (current.equals(laberinto[i][j])) || laberinto[i][j].isWall()) continue;
 
@@ -220,8 +223,10 @@ public class Grid extends VBox implements Runnable, EstadoCeldas {
                         if (pathBlockedDiagonaly(i, j)) continue;
                     }
 
+                    // Si el nodo ya ha sido calculado lo descartamos.
                     if (laberinto[i][j].closed) continue;
 
+                    // El nodo final ya ha sido encontrado
                     if (laberinto[i][j].equals(endNode)) {
                         resuelto = true;
                         endNode.parent = laberinto[current.getFila()][current.getColumna()];
@@ -229,22 +234,10 @@ public class Grid extends VBox implements Runnable, EstadoCeldas {
                     else {
                         laberinto[i][j].closed = true;
 
-                        // Comparar diagonal con el nodo final
-                        if (isDiagonal(i, j, endNode.getFila(), endNode.getColumna())) {
-                            laberinto[i][j].Hcost = current.Hcost + (14 * Math.abs(i - endNode.getFila()));
-                        }
-                        else {
-                            laberinto[i][j].Hcost = current.Hcost + calculateCost(endNode, laberinto[i][j]);
-                        }
-                        // Comparar diagonal con el nodo inicial
-                        if (isDiagonal(i, j, current.getFila(), current.getColumna())) {
-                            laberinto[i][j].Gcost = current.Gcost + 14;
-                        }
-                        else {
-                            laberinto[i][j].Gcost = current.Gcost + calculateCost(current, laberinto[i][j]);
-                        }
-
+                        laberinto[i][j].Gcost = calculateCost(current, laberinto[i][j]);
+                        laberinto[i][j].Hcost = calculateCost(endNode, laberinto[i][j]);
                         laberinto[i][j].Fcost = laberinto[i][j].Gcost + laberinto[i][j].Hcost;
+
                         laberinto[i][j].parent = current;
                         parentList.add(laberinto[i][j]);
 
@@ -266,9 +259,10 @@ public class Grid extends VBox implements Runnable, EstadoCeldas {
         return resuelto;
     }
 
+    // Devuelve el nodo con menos coste gracias a que la lista es previamente ordenada.
     private Celda getLowestNode() {
         parentList.sort(new SortCeldas());
-        if (parentList.get(0)!= null) {
+        if (parentList.get(0) != null) {
             int i = parentList.get(0).getFila();
             int j = parentList.get(0).getColumna();
             laberinto[i][j].pintarCelda("ACTUAL");
@@ -276,9 +270,15 @@ public class Grid extends VBox implements Runnable, EstadoCeldas {
         return parentList.remove(0);
     }
 
+    /**
+     * Calcula el coste entre dos nodos (* 14 las casillas diagonalmente, * 10 las casillas horizontales y verticales).
+     * @param target
+     * @param current
+     * @return coste
+     */
     private int calculateCost(Celda target, Celda current) {
-        return 10 * ((Math.abs(target.getFila() - current.getFila()) +
-                    (Math.abs(target.getColumna() - current.getColumna()))));
+        return Math.abs(target.getFila() - current.getFila()) * 14 +
+               Math.abs(target.getColumna() - current.getColumna()) * 10;
     }
 
     private boolean isDiagonal(int i, int j, int y, int x) {
