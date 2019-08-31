@@ -78,7 +78,7 @@ public class Grid extends VBox implements Runnable, EstadoCeldas {
     public void crearTodoAbierto() {
         for (int i = 0; i < dimension; i++) {
             for (int j = 0; j < dimension; j++) {
-                laberinto[i][j].setAbierto();
+                laberinto[i][j].fullRestart();
             }
         }
     }
@@ -127,6 +127,7 @@ public class Grid extends VBox implements Runnable, EstadoCeldas {
             if (resolverAStar(startNode)) {
                 System.out.println( "LABERINTO RESUELTO!" );
                 paintPath(endNode.parent);
+                System.out.println("FIN");
             } else {
                 System.out.println( "LABERINTO NO RESUELTO!" );
             }
@@ -203,7 +204,7 @@ public class Grid extends VBox implements Runnable, EstadoCeldas {
             if (!current.closed) {
                 synchronized (this) {
                     try {
-                        laberinto[current.getFila()][current.getColumna()].pintarCelda("ACTUAL");
+                        laberinto[current.getFila()][current.getColumna()].pintarCelda("EXPANSION");
                         wait(leerVelocidad());
                     } catch(InterruptedException e) { }
                 }
@@ -249,7 +250,7 @@ public class Grid extends VBox implements Runnable, EstadoCeldas {
 
                         synchronized (this) {
                             try {
-                                laberinto[i][j].pintarCelda("ACTUAL");
+                                laberinto[i][j].pintarCelda("EXPANSION");
                                 wait(leerVelocidad());
                             } catch(InterruptedException e) { }
                         }
@@ -267,6 +268,11 @@ public class Grid extends VBox implements Runnable, EstadoCeldas {
 
     private Celda getLowestNode() {
         parentList.sort(new SortCeldas());
+        if (parentList.get(0)!= null) {
+            int i = parentList.get(0).getFila();
+            int j = parentList.get(0).getColumna();
+            laberinto[i][j].pintarCelda("ACTUAL");
+        }
         return parentList.remove(0);
     }
 

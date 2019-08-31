@@ -25,27 +25,32 @@ public class Propiedades {
 
     private String rutaAbsoluta;
     private File archivo;
-    private static final Map<String, String> propiedadesIniciales = Map.of(
-            "ABIERTO",   "#FFFFFF",
-            "PARED",     "#000000",
-            "ACTUAL",    "#2AFF00",
-            "LLEGADA",   "#F3FF00",
-            "VUELTA",    "FF0000",
-            "INICIO",    "#0087FF",
-            "DIMENSION", "31",
-            "MODO",      "LABERINTO",
-            "VELOCIDAD", "50",
-            "ALGORITMO", "DFS"
-    );
+    private HashMap<String, String> propiedadesIniciales;
     private Properties propiedades;
 
     /**
      * Constructor del objeto Propiedades.
      */
     public Propiedades() {
+        propiedadesIniciales = new HashMap<>();
+        iniciarPropiedades();
         this.archivo = new File("propiedades.properties");
         this.rutaAbsoluta = archivo.getAbsolutePath();
         this.propiedades = new Properties();
+    }
+
+    private void iniciarPropiedades() {
+        propiedadesIniciales.put("ABIERTO",   "#FFFFFF");
+        propiedadesIniciales.put("PARED",     "#000000");
+        propiedadesIniciales.put("ACTUAL",    "#2AFF00");
+        propiedadesIniciales.put("LLEGADA",   "#F3FF00");
+        propiedadesIniciales.put("VUELTA",    "FF0000");
+        propiedadesIniciales.put("INICIO",    "#0087FF");
+        propiedadesIniciales.put("DIMENSION", "31");
+        propiedadesIniciales.put("MODO",      "LABERINTO");
+        propiedadesIniciales.put("VELOCIDAD", "50");
+        propiedadesIniciales.put("ALGORITMO", "DFS");
+        propiedadesIniciales.put("EXPANSION", "#66BB6A");
     }
 
     /**
@@ -112,6 +117,7 @@ public class Propiedades {
             conf.put("MODO",      p.getProperty("MODO"));
             conf.put("VELOCIDAD", p.getProperty("VELOCIDAD"));
             conf.put("ALGORITMO", p.getProperty("ALGORITMO"));
+            conf.put("EXPANSION", p.getProperty("EXPANSION"));
         } catch (IOException e) {
             System.out.println(e.getMessage());
             System.out.println(e.getClass().getName());

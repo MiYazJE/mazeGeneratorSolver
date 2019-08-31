@@ -113,7 +113,7 @@ public class Celda extends Rectangle implements EstadoCeldas {
         });
         this.setOnMouseEntered(e -> {
             if (e.isShiftDown()) {
-                this.setAbierto();
+                this.fullRestart();
             }
             if (e.isAltDown()) {
                 this.setPared();
@@ -125,7 +125,6 @@ public class Celda extends Rectangle implements EstadoCeldas {
      * Pinta la celda y cambia su valor a ABIERTO
      */
     public void setAbierto() {
-        restart();
         this.valor = ABIERTO;
         pintarCelda("ABIERTO");
     }
@@ -182,6 +181,18 @@ public class Celda extends Rectangle implements EstadoCeldas {
     }
 
     public void restart() {
+        if (this.valor != PARED) {
+            setAbierto();
+            this.Gcost = 0;
+            this.Hcost = 0;
+            this.Fcost = 0;
+            this.closed = false;
+            this.parent = null;
+        }
+    }
+
+    public void fullRestart() {
+        setAbierto();
         this.Gcost = 0;
         this.Hcost = 0;
         this.Fcost = 0;
