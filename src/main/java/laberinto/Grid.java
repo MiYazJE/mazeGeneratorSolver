@@ -86,7 +86,7 @@ public class Grid extends VBox implements Runnable, EstadoCeldas {
 
     private void cargarDimensiones() {
         this.dimension = Integer.parseInt(conf.get("DIMENSION"));
-        this.sizeCelda = 850 / dimension;
+        this.sizeCelda = 750 / dimension;
         this.maze = new int[dimension][dimension];
         this.laberinto = new Celda[dimension][dimension];
     }
@@ -249,10 +249,10 @@ public class Grid extends VBox implements Runnable, EstadoCeldas {
 
                         if (actual.parent == null) {
                             asignarCostes(actual, tempHcost, tempGcost, current);
-                            parentList.add(actual);
                         }
                         else {
                             if (tempFcost < actual.Fcost) {
+                                parentList.remove(laberinto[i][j]);
                                 asignarCostes(actual, tempHcost, tempGcost, current);
                             }
                         }
@@ -280,6 +280,7 @@ public class Grid extends VBox implements Runnable, EstadoCeldas {
         nodo.Hcost = Hcost;
         nodo.Fcost = Hcost + Gcost;
         nodo.parent = parent;
+        parentList.add(nodo);
     }
 
     // Devuelve el nodo con menos coste gracias a que la lista es previamente ordenada.
@@ -300,8 +301,8 @@ public class Grid extends VBox implements Runnable, EstadoCeldas {
      * @return coste
      */
     private int calculateCost(Celda target, Celda current) {
-        return Math.abs(target.getFila() - current.getFila()) +
-               Math.abs(target.getColumna() - current.getColumna());
+        return (Math.abs(target.getFila() - current.getFila()) * 14) +
+               (Math.abs(target.getColumna() - current.getColumna()) * 10);
     }
 
     private boolean isDiagonal(int i, int j, int y, int x) {
