@@ -17,15 +17,6 @@ import java.util.*;
 
 public class Grid extends VBox implements Runnable, EstadoCeldas {
 
-    /*private int[][] maze = {
-            {0,0,0,0,0,0,0},
-            {0,1,1,1,1,1,0},
-            {0,1,0,1,0,0,0},
-            {0,1,0,1,0,1,0},
-            {0,0,0,1,0,1,0},
-            {0,1,1,1,1,1,0},
-            {0,0,0,0,0,0,0}
-    };*/
     private int[][] maze;
     // Almacena cada una de las celdas generadas en el laberinto
     private Celda[][] laberinto;
@@ -89,7 +80,8 @@ public class Grid extends VBox implements Runnable, EstadoCeldas {
     public void limpiarLaberinto() {
         for (int i = 0; i < dimension; i++)
             for (int j = 0; j < dimension; j++)
-                laberinto[i][j].restart();
+                if (!laberinto[i][j].isWall())
+                    laberinto[i][j].restart();
     }
 
     private void cargarDimensiones() {
@@ -99,19 +91,34 @@ public class Grid extends VBox implements Runnable, EstadoCeldas {
         this.laberinto = new Celda[dimension][dimension];
     }
 
+    private void iniciarCeldas() {
+        for (int i = 0; i < dimension; i++) {
+            for (int j = 0; j < dimension; j++) {
+                maze[i][j] = ABIERTO;
+                laberinto[i][j] = new Celda(i, j);
+                laberinto[i][j].setAbierto();
+            }
+        }
+    }
+    
     public void generarLaberinto() {
         conf = Propiedades.cargarPropiedades();
         cargarDimensiones();
-        if (!conf.get("MODO").equals("PINTAR")) {
-            if (conf.get("ALGORITMO").equals("DFS")) {
-                genDFS.crearLaberinto(dimension);
-                maze = genDFS.getLaberinto();
-            }
-            else {
-                gen.crearLaberinto(dimension);
-                maze = gen.getLaberinto();
-            }
+
+        switch (conf.get("MODO")) {
+            case "LABERINTO":
+                if (conf.get("ALGORITMO").equals("DFS")) {
+                    genDFS.crearLaberinto(dimension);
+                    maze = genDFS.getLaberinto();
+                } else {
+                    gen.crearLaberinto(dimension);
+                    maze = gen.getLaberinto();
+                }
+                break;
+            case "PINTAR":
+                iniciarCeldas();
         }
+
         pintarLaberinto();
     }
 
@@ -148,8 +155,8 @@ public class Grid extends VBox implements Runnable, EstadoCeldas {
         if (node.parent == null) return;
 
         System.out.println( node.getFila() + "-" + node.getColumna() );
-        laberinto[node.getFila()][node.getColumna()].pintarCelda("VUELTA");
 
+        laberinto[node.getFila()][node.getColumna()].pintarCelda("VUELTA");
         synchronized (this) {
             try {
                 wait(leerVelocidad());
@@ -197,6 +204,7 @@ public class Grid extends VBox implements Runnable, EstadoCeldas {
 
     private boolean resolverAStar(Celda current) {
 
+        int tempHcost, tempFcost, tempGcost;
         current.closed = true;
 
         while (true) {
@@ -216,7 +224,7 @@ public class Grid extends VBox implements Runnable, EstadoCeldas {
                     // Evitar si el nodo se encuentra en cualquier diagonal
                     // if (isDiagonal(i, j, current.getFila(), current.getColumna())) continue;
 
-                    // Si el nodo es el mismo que el parent o si es una pared, seguimos...
+                    // Si el nodo es el mismo que el padre o si es una pared, seguimos...
                     if (fuera(i, j) || (current.equals(laberinto[i][j])) || laberinto[i][j].isWall()) continue;
 
                     if (i != current.getFila() && j != current.getColumna()) {
@@ -232,14 +240,22 @@ public class Grid extends VBox implements Runnable, EstadoCeldas {
                         endNode.parent = laberinto[current.getFila()][current.getColumna()];
                     }
                     else {
-                        laberinto[i][j].closed = true;
 
-                        laberinto[i][j].Gcost = calculateCost(current, laberinto[i][j]);
-                        laberinto[i][j].Hcost = calculateCost(endNode, laberinto[i][j]);
-                        laberinto[i][j].Fcost = laberinto[i][j].Gcost + laberinto[i][j].Hcost;
+                        Celda actual = laberinto[i][j];
 
-                        laberinto[i][j].parent = current;
-                        parentList.add(laberinto[i][j]);
+                        tempGcost = current.Gcost + calculateCost(current, actual);
+                        tempHcost = calculateCost(endNode, actual);
+                        tempFcost = tempHcost + tempGcost;
+
+                        if (actual.parent == null) {
+                            asignarCostes(actual, tempHcost, tempGcost, current);
+                            parentList.add(actual);
+                        }
+                        else {
+                            if (tempFcost < actual.Fcost) {
+                                asignarCostes(actual, tempHcost, tempGcost, current);
+                            }
+                        }
 
                         synchronized (this) {
                             try {
@@ -257,6 +273,13 @@ public class Grid extends VBox implements Runnable, EstadoCeldas {
         }
 
         return resuelto;
+    }
+
+    private void asignarCostes(Celda nodo, int Hcost, int Gcost, Celda parent) {
+        nodo.Gcost = Gcost;
+        nodo.Hcost = Hcost;
+        nodo.Fcost = Hcost + Gcost;
+        nodo.parent = parent;
     }
 
     // Devuelve el nodo con menos coste gracias a que la lista es previamente ordenada.
@@ -277,8 +300,8 @@ public class Grid extends VBox implements Runnable, EstadoCeldas {
      * @return coste
      */
     private int calculateCost(Celda target, Celda current) {
-        return Math.abs(target.getFila() - current.getFila()) * 14 +
-               Math.abs(target.getColumna() - current.getColumna()) * 10;
+        return Math.abs(target.getFila() - current.getFila()) +
+               Math.abs(target.getColumna() - current.getColumna());
     }
 
     private boolean isDiagonal(int i, int j, int y, int x) {
@@ -339,6 +362,8 @@ public class Grid extends VBox implements Runnable, EstadoCeldas {
 class SortCeldas implements Comparator<Celda> {
     @Override
     public int compare(Celda o1, Celda o2) {
+        if (o1.Fcost == o2.Fcost)
+            return o1.Hcost - o2.Hcost;
         return o1.Fcost - o2.Fcost;
     }
 }

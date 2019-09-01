@@ -145,10 +145,7 @@ public class Interfaz extends Application {
 
         btnLimpiar.setOnAction(e -> {
             if (!thread.isAlive())
-                if (propiedades.obtenerPropiedad("MODO").equals("PINTAR"))
-                    laberinto.crearTodoAbierto();
-                else
-                    laberinto.limpiarLaberinto();
+                laberinto.limpiarLaberinto();
         });
 
         btnCrearLaberinto.setOnAction(e -> {

@@ -23,7 +23,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Arrays;
-import java.util.Map;
+import java.util.HashMap;
 import java.util.ResourceBundle;
 
 /**
@@ -47,7 +47,7 @@ public class VentanaConfiguracion extends AnchorPane implements Initializable  {
     private ObservableList<String> algoritmos = FXCollections.observableArrayList(
             Arrays.asList("DFS", "Random Recursive"));
 
-    private Map<String, String> conf;
+    private HashMap<String, String> conf;
     private Parent parent;
 
     /**
@@ -57,7 +57,6 @@ public class VentanaConfiguracion extends AnchorPane implements Initializable  {
     public VentanaConfiguracion() {
         init();
         getChildren().add(parent);
-        conf = Propiedades.cargarPropiedades();
         cargarValores();
     }
 
@@ -125,13 +124,14 @@ public class VentanaConfiguracion extends AnchorPane implements Initializable  {
      * en el archivo propiedades.properties
      */
     public void cargarValores() {
+        conf = Propiedades.cargarPropiedades();
+        this.fieldDimension.setText(conf.get("DIMENSION"));
         this.colorAbierto.setValue(Color.valueOf(conf.get("ABIERTO")));
         this.colorPared.setValue(Color.valueOf(conf.get("PARED")));
         this.colorVueltaFin.setValue(Color.valueOf(conf.get("VUELTA")));
         this.colorRecorrido.setValue(Color.valueOf(conf.get("ACTUAL")));
         this.colorInicio.setValue( Color.valueOf(conf.get("INICIO")) );
         this.colorLlegada.setValue(Color.valueOf(conf.get("LLEGADA")));
-        this.fieldDimension.setText(conf.get("DIMENSION"));
         this.checkModo.setSelected( conf.get("MODO").equals("PINTAR") );
         this.comboAlgoritmo.setValue(conf.get("ALGORITMO"));
     }

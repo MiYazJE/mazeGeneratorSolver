@@ -28,6 +28,7 @@ public class Celda extends Rectangle implements EstadoCeldas {
     public Celda(int f, int c) {
         this.fila = f;
         this.columna = c;
+        p = new Propiedades();
     }
 
     public Celda(int f, int c, int estado, double size) {

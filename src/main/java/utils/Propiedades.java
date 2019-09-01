@@ -32,14 +32,14 @@ public class Propiedades {
      * Constructor del objeto Propiedades.
      */
     public Propiedades() {
-        propiedadesIniciales = new HashMap<>();
-        iniciarPropiedades();
+        iniciarPropiedadesIniciales();
         this.archivo = new File("propiedades.properties");
         this.rutaAbsoluta = archivo.getAbsolutePath();
         this.propiedades = new Properties();
     }
 
-    private void iniciarPropiedades() {
+    private void iniciarPropiedadesIniciales() {
+        propiedadesIniciales = new HashMap<>();
         propiedadesIniciales.put("ABIERTO",   "#FFFFFF");
         propiedadesIniciales.put("PARED",     "#000000");
         propiedadesIniciales.put("ACTUAL",    "#2AFF00");
@@ -58,22 +58,20 @@ public class Propiedades {
      * sino se agregaran las propiedades predeterminada al archivo
      */
     public void crearPropiedades() {
-
         if (!verificarSiExiste()) {
             try { archivo.createNewFile(); }
             catch (IOException e) {
                 System.out.println("Problemas al crear el fichero.\n" + e.getMessage());
             }
-            asignarPropiedadesIniciales();
+            asignarPropiedades();
         }
-
     }
 
     /**
      * Escribir en un fichero .properties la configuracion predeterminada
      * del programa, como los colores...
      */
-    private void asignarPropiedadesIniciales() {
+    private void asignarPropiedades() {
 
         try {
 
@@ -82,7 +80,7 @@ public class Propiedades {
             for (Map.Entry<String, String> entry : propiedadesIniciales.entrySet()) {
                 propiedades.setProperty(entry.getKey(), entry.getValue());
             }
-            propiedades.store(new FileWriter(this.rutaAbsoluta), rutaAbsoluta + "\nEscribiendo configuracion predeterminada.");
+            propiedades.store(new FileWriter(this.rutaAbsoluta), "");
 
         } catch (IOException e) {
             System.out.println("Problemas al escribir en el fichero de configuración.\n" +
