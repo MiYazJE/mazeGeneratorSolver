@@ -42,15 +42,17 @@ public class Propiedades {
         propiedadesIniciales = new HashMap<>();
         propiedadesIniciales.put("ABIERTO",   "#FFFFFF");
         propiedadesIniciales.put("PARED",     "#000000");
-        propiedadesIniciales.put("ACTUAL",    "#2AFF00");
+        propiedadesIniciales.put("ACTUAL",    "#19DEEB");
         propiedadesIniciales.put("LLEGADA",   "#F3FF00");
         propiedadesIniciales.put("VUELTA",    "FF0000");
         propiedadesIniciales.put("INICIO",    "#0087FF");
         propiedadesIniciales.put("DIMENSION", "31");
         propiedadesIniciales.put("MODO",      "LABERINTO");
         propiedadesIniciales.put("VELOCIDAD", "50");
-        propiedadesIniciales.put("ALGORITMO", "DFS");
+        propiedadesIniciales.put("ALGORITMOCREACION", "DFS");
         propiedadesIniciales.put("EXPANSION", "#66BB6A");
+        propiedadesIniciales.put("ALGORITMOBUSQUEDA", "A star");
+        propiedadesIniciales.put("DIAGONALES", "SI");
     }
 
     /**
@@ -114,8 +116,10 @@ public class Propiedades {
             conf.put("DIMENSION", p.getProperty("DIMENSION"));
             conf.put("MODO",      p.getProperty("MODO"));
             conf.put("VELOCIDAD", p.getProperty("VELOCIDAD"));
-            conf.put("ALGORITMO", p.getProperty("ALGORITMO"));
+            conf.put("ALGORITMOCREACION", p.getProperty("ALGORITMOCREACION"));
             conf.put("EXPANSION", p.getProperty("EXPANSION"));
+            conf.put("ALGORITMOBUSQUEDA", p.getProperty("ALGORITMOBUSQUEDA"));
+            conf.put("DIAGONALES", p.getProperty("DIAGONALES"));
         } catch (IOException e) {
             System.out.println(e.getMessage());
             System.out.println(e.getClass().getName());

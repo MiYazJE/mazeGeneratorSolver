@@ -184,10 +184,9 @@ public class Interfaz extends Application {
      */
     private void propiedadesSlider() {
         slider.setMaxWidth(150);
-        Integer valorSlider = Integer.valueOf(propiedades.obtenerPropiedad("VELOCIDAD"));
-        slider.setValue(valorSlider);
+        slider.setValue(Double.valueOf(propiedades.obtenerPropiedad("VELOCIDAD")).intValue());
         slider.setMin(1);
-        slider.setMax(150);
+        slider.setMax(50);
     }
 
     private void creacionVentanas() {

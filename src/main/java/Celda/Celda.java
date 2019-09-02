@@ -1,8 +1,13 @@
 package Celda;
 
+import javafx.application.Platform;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.input.MouseButton;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Font;
 import utils.Propiedades;
 
 import java.util.Comparator;
@@ -11,34 +16,41 @@ import java.util.Objects;
 /**
  * Esta clase representa una Celda en una cuadricula.
  */
-public class Celda extends Rectangle implements EstadoCeldas {
+public class Celda extends StackPane implements EstadoCeldas {
 
     private int fila;
     private int columna;
     private int valor;
     private Propiedades p;
     private int anteriorColor;
+    private Rectangle rectangle;
 
     public Celda parent; // Puntero al siguiente nodo mas cercano
     public int Gcost; // Coste de ir de esta celda a la celda inicio
     public int Hcost; // Coste de ir de esta celda a la celda final
     public int Fcost; // Suma de los costes G y H
     public boolean closed; // Representa si los costes de esta celda ya estan calculados.
+    private Label label;
 
     public Celda(int f, int c) {
+        this.rectangle = new Rectangle();
+        getChildren().add(rectangle);
         this.fila = f;
         this.columna = c;
         p = new Propiedades();
     }
 
     public Celda(int f, int c, int estado, double size) {
-        super(size, size);
+        this.rectangle = new Rectangle(size, size);
+        getChildren().add(rectangle);
         this.fila = f;
         this.columna = c;
         this.valor = estado;
         p = new Propiedades();
         aplicarEstilo(estado);
         aplicarEventos();
+        label = new Label();
+        label.setFont(new Font("Arial", 30));
     }
 
     /**
@@ -74,7 +86,8 @@ public class Celda extends Rectangle implements EstadoCeldas {
      * @param color : String de la propiedad del color en el fichero .properties
      */
     public void pintarCelda(String color) {
-        this.setFill(Color.valueOf(p.obtenerPropiedad(color)));
+        this.rectangle.setFill(Color.valueOf(p.obtenerPropiedad(color)));
+        // this.rectangle.setStroke(Color.WHITE);
     }
 
     /**
@@ -190,6 +203,18 @@ public class Celda extends Rectangle implements EstadoCeldas {
             this.closed = false;
             this.parent = null;
         }
+    }
+
+    public void restartLabel() {
+        this.label.setText("");
+    }
+
+    public void setInfo() {
+        Platform.runLater( () -> {
+            if (parent != null) getChildren().remove(this.label);
+            this.label.setText("Gcost: " + this.Gcost + "\nHcost: " + this.Hcost + "\nFcost: " + this.Fcost);
+            this.getChildren().add(label);
+        });
     }
 
     public void fullRestart() {

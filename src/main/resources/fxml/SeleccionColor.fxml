@@ -22,9 +22,9 @@
          <children>
             <VBox alignment="TOP_CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="721.0" prefWidth="519.0" style="-fx-background-color: transparent;">
                <children>
-                  <HBox alignment="CENTER" nodeOrientation="LEFT_TO_RIGHT" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
+                  <HBox alignment="CENTER" nodeOrientation="LEFT_TO_RIGHT" prefHeight="80.0" prefWidth="200.0" spacing="10.0">
                      <children>
-                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="DIMENSIONES" wrappingWidth="108.6279296875" />
+                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="DIMENSIONES" wrappingWidth="100.0" />
                         <JFXTextField fx:id="fieldDimension" alignment="CENTER" focusColor="BLACK" prefHeight="19.0" prefWidth="72.0" />
                         <ImageView fx:id="imgQuestion" fitHeight="21.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
                            <image>
@@ -36,46 +36,69 @@
                         <Insets />
                      </VBox.margin>
                   </HBox>
-                  <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
+                  <HBox alignment="CENTER" prefHeight="80.0" prefWidth="200.0" spacing="10.0">
                      <children>
-                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Celda ABIERTO" wrappingWidth="108.6279296875" />
+                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Celda ABIERTO" wrappingWidth="100.0" />
                         <JFXColorPicker fx:id="colorAbierto" />
                      </children>
                   </HBox>
-                  <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
+                  <HBox alignment="CENTER" prefHeight="80.0" prefWidth="200.0" spacing="10.0">
                      <children>
-                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Celda PARED" wrappingWidth="108.6279296875" />
-                        <JFXColorPicker fx:id="colorPared" />
+                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Celda PARED" wrappingWidth="100.0" />
+                        <JFXColorPicker fx:id="colorPared" prefHeight="25.0" prefWidth="105.0" />
                      </children>
                   </HBox>
-                  <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
+                  <HBox alignment="CENTER" prefHeight="80.0" prefWidth="200.0" spacing="10.0">
                      <children>
-                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Celda VUELTA FIN" wrappingWidth="127.6279296875" />
+                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Celda VUELTA FIN" wrappingWidth="100.0" />
                         <JFXColorPicker fx:id="colorVueltaFin" />
                      </children>
                   </HBox>
-                  <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
+                  <HBox alignment="CENTER" prefHeight="80.0" prefWidth="200.0" spacing="10.0">
                      <children>
-                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Celda RECORRIDO" wrappingWidth="135.6279296875" />
+                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Celda RECORRIDO" wrappingWidth="100.0" />
                         <JFXColorPicker fx:id="colorRecorrido" />
                      </children>
                   </HBox>
-                  <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
+                  <HBox alignment="CENTER" prefHeight="80.0" prefWidth="200.0" spacing="10.0">
                      <children>
-                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Celda INICIO" wrappingWidth="127.6279296875" />
+                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Celda INICIO" wrappingWidth="100.0" />
                         <JFXColorPicker fx:id="colorInicio" />
                      </children>
                   </HBox>
-                  <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
+                  <HBox alignment="CENTER" prefHeight="80.0" prefWidth="200.0" spacing="10.0">
                      <children>
-                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Celda FIN" wrappingWidth="127.6279296875" />
+                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Celda FIN" wrappingWidth="100.0" />
                         <JFXColorPicker fx:id="colorLlegada" />
                      </children>
                   </HBox>
-                  <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="30.0">
+                  <HBox alignment="CENTER" prefHeight="147.0" prefWidth="519.0" spacing="30.0">
                      <children>
-                        <JFXCheckBox fx:id="checkModo" text="Modo Dibujar" />
-                        <JFXComboBox fx:id="comboAlgoritmo" focusColor="BLACK" nodeOrientation="LEFT_TO_RIGHT" prefHeight="25.0" prefWidth="158.0" promptText="Selecciona un algoritmo" />
+                        <VBox alignment="CENTER" spacing="40.0">
+                           <children>
+                              <JFXCheckBox fx:id="checkModo" prefWidth="100.0" text="Modo Dibujar" />
+                              <JFXCheckBox fx:id="checkDiagonales" prefWidth="100.0" text="Diagonales" />
+                           </children>
+                        </VBox>
+                        <VBox alignment="CENTER" prefHeight="90.0" prefWidth="238.0">
+                           <children>
+                              <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Creación del laberinto" textAlignment="CENTER" wrappingWidth="180.0">
+                                 <font>
+                                    <Font size="17.0" />
+                                 </font>
+                              </Text>
+                              <JFXComboBox fx:id="comboAlgoritmoCreacion" focusColor="BLACK" nodeOrientation="LEFT_TO_RIGHT" prefHeight="25.0" prefWidth="146.0" promptText="Selecciona un algoritmo" />
+                              <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Algoritmo de búsqueda" textAlignment="CENTER" wrappingWidth="180.0">
+                                 <VBox.margin>
+                                    <Insets top="15.0" />
+                                 </VBox.margin>
+                                 <font>
+                                    <Font size="17.0" />
+                                 </font>
+                              </Text>
+                              <JFXComboBox fx:id="comboAlgoritmoBusqueda" focusColor="BLACK" nodeOrientation="LEFT_TO_RIGHT" prefHeight="25.0" prefWidth="144.0" promptText="Selecciona un algoritmo" />
+                           </children>
+                        </VBox>
                      </children>
                   </HBox>
                   <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="10.0">

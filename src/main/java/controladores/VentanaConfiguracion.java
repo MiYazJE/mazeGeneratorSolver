@@ -42,10 +42,14 @@ public class VentanaConfiguracion extends AnchorPane implements Initializable  {
     @FXML private JFXTextField fieldDimension;
     @FXML private ImageView imgQuestion;
     @FXML private JFXCheckBox checkModo;
-    @FXML private JFXComboBox<String> comboAlgoritmo;
+    @FXML private JFXComboBox<String> comboAlgoritmoCreacion;
+    @FXML private JFXComboBox<String> comboAlgoritmoBusqueda;
+    @FXML private JFXCheckBox checkDiagonales;
 
-    private ObservableList<String> algoritmos = FXCollections.observableArrayList(
+    private ObservableList<String> algoritmosCreacion = FXCollections.observableArrayList(
             Arrays.asList("DFS", "Random Recursive"));
+    private ObservableList<String> algoritmosBusqueda = FXCollections.observableArrayList(
+            Arrays.asList("DFS", "A star"));
 
     private HashMap<String, String> conf;
     private Parent parent;
@@ -78,7 +82,8 @@ public class VentanaConfiguracion extends AnchorPane implements Initializable  {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
 
-        this.comboAlgoritmo.setItems( algoritmos );
+        this.comboAlgoritmoCreacion.setItems(algoritmosCreacion);
+        this.comboAlgoritmoBusqueda.setItems(algoritmosBusqueda);
 
         insertarToolTip(this.imgQuestion);
         fieldSoloNumeros(this.fieldDimension);
@@ -133,7 +138,9 @@ public class VentanaConfiguracion extends AnchorPane implements Initializable  {
         this.colorInicio.setValue( Color.valueOf(conf.get("INICIO")) );
         this.colorLlegada.setValue(Color.valueOf(conf.get("LLEGADA")));
         this.checkModo.setSelected( conf.get("MODO").equals("PINTAR") );
-        this.comboAlgoritmo.setValue(conf.get("ALGORITMO"));
+        this.checkDiagonales.setSelected( conf.get("DIAGONALES").equals("SI") );
+        this.comboAlgoritmoCreacion.setValue(conf.get("ALGORITMOCREACION"));
+        this.comboAlgoritmoBusqueda.setValue(conf.get("ALGORITMOBUSQUEDA"));
     }
 
     /**
@@ -153,7 +160,8 @@ public class VentanaConfiguracion extends AnchorPane implements Initializable  {
             p.setProperty("ACTUAL",    this.colorRecorrido.getValue().toString());
             p.setProperty("LLEGADA",   this.colorLlegada.getValue().toString());
             p.setProperty("INICIO",    this.colorInicio.getValue().toString());
-            p.setProperty("ALGORITMO", this.comboAlgoritmo.getValue());
+            p.setProperty("ALGORITMOCREACION", this.comboAlgoritmoCreacion.getValue());
+            p.setProperty("ALGORITMOBUSQUEDA", this.comboAlgoritmoBusqueda.getValue());
 
             // Las dimensiones del laberinto solo pueden ser impares,
             // el algoritmo de creación de laberintos lo requiere *indexAutoOfBonds*
@@ -163,6 +171,9 @@ public class VentanaConfiguracion extends AnchorPane implements Initializable  {
 
             String modo = (this.checkModo.isSelected()) ? "PINTAR" : "LABERINTO";
             p.setProperty("MODO", modo);
+
+            String diagonales = (this.checkDiagonales.isSelected()) ? "SI" : "NO";
+            p.setProperty("DIAGONALES", diagonales);
 
             p.save();
 
