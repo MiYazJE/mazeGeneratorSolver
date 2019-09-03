@@ -86,6 +86,13 @@ public class Grid extends VBox implements Runnable, EstadoCeldas {
         pintarLaberinto();
     }
 
+    private void cargarDimensiones() {
+        this.dimension = Integer.parseInt(conf.get("DIMENSION"));
+        this.sizeCelda = 750 / dimension;
+        this.maze = new int[dimension][dimension];
+        this.laberinto = new Celda[dimension][dimension];
+    }
+
     private Long leerVelocidad() {
         return Long.parseLong(propiedades.obtenerPropiedad("VELOCIDAD"));
     }
@@ -256,11 +263,13 @@ public class Grid extends VBox implements Runnable, EstadoCeldas {
         nodo.Fcost  = Hcost + Gcost;
         nodo.parent = parent;
 
-        if (!openList.isEmpty() && nodo.Fcost <= openList.get(0).Fcost)
+        // Insertamos el nodo con una busqueda binaria, de esta evitamos tener
+        // que estar ordenando todas las veces que insertemos.
+        /*if (!openList.isEmpty() && nodo.Fcost <= openList.get(0).Fcost && nodo.Hcost <= openList.get(0).Hcost)
             openList.add(0, nodo);
-        else if (!openList.isEmpty() && nodo.Fcost >= openList.get(openList.size()-1).Fcost)
+        else if (!openList.isEmpty() && nodo.Fcost >= openList.get(openList.size()-1).Fcost && nodo.Hcost >= openList.get(openList.size()-1).Fcost)
             openList.add(nodo);
-        else
+        else*/
             openList.add( BB(openList, nodo), nodo );
     }
 
@@ -294,7 +303,7 @@ public class Grid extends VBox implements Runnable, EstadoCeldas {
             return Math.abs(difRows + difCols) * 10;
         }*/
 
-        return Math.abs(difRows + difCols) * 10;
+         return Math.abs(difRows + difCols) * 10;
     }
 
     private boolean isDiagonal(int i, int j, int y, int x) {
@@ -371,7 +380,7 @@ public class Grid extends VBox implements Runnable, EstadoCeldas {
         int right = list.size();
         while (left < right) {
             int middle = (left + right) / 2;
-            if (list.get(middle).Fcost > node.Fcost /*&& list.get(middle).Hcost > node.Hcost*/)
+            if (list.get(middle).Fcost >= node.Fcost)
                 right = middle;
             else
                 left = middle + 1;
@@ -391,13 +400,6 @@ public class Grid extends VBox implements Runnable, EstadoCeldas {
                 if (dimension <= 11)
                     laberinto[i][j].restartLabel();
             }
-    }
-
-    private void cargarDimensiones() {
-        this.dimension = Integer.parseInt(conf.get("DIMENSION"));
-        this.sizeCelda = 850 / dimension;
-        this.maze = new int[dimension][dimension];
-        this.laberinto = new Celda[dimension][dimension];
     }
 
     private void iniciarCeldas() {
