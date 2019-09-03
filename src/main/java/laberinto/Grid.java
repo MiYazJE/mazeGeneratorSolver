@@ -263,14 +263,21 @@ public class Grid extends VBox implements Runnable, EstadoCeldas {
         nodo.Fcost  = Hcost + Gcost;
         nodo.parent = parent;
 
-        // Insertamos el nodo con una busqueda binaria, de esta evitamos tener
-        // que estar ordenando todas las veces que insertemos.
-        /*if (!openList.isEmpty() && nodo.Fcost <= openList.get(0).Fcost && nodo.Hcost <= openList.get(0).Hcost)
-            openList.add(0, nodo);
-        else if (!openList.isEmpty() && nodo.Fcost >= openList.get(openList.size()-1).Fcost && nodo.Hcost >= openList.get(openList.size()-1).Fcost)
-            openList.add(nodo);
-        else*/
-            openList.add( BB(openList, nodo), nodo );
+        // openList.add( nodo );
+        openList.add( BB(openList, nodo), nodo );
+    }
+
+    private int BB(ArrayList<Celda> list, Celda node) {
+        int left = 0;
+        int right = list.size();
+        while (left < right) {
+            int middle = (left + right) / 2;
+            if (list.get(middle).Fcost >= node.Fcost /*&& list.get(middle).Hcost >= node.Hcost*/)
+                right = middle;
+            else
+                left = middle + 1;
+        }
+        return left;
     }
 
     // Devuelve el nodo con menos coste gracias a que la lista es previamente ordenada.
@@ -294,16 +301,14 @@ public class Grid extends VBox implements Runnable, EstadoCeldas {
         int difRows = Math.abs(current.getFila() - target.getFila());
         int difCols = Math.abs(current.getColumna() - target.getColumna());
 
-        /*if (conf.get("DIAGONALES").equals("SI")) {
+        if (conf.get("DIAGONALES").equals("SI")) {
             int gCost = Math.min(difRows, difCols);
             int hCost = Math.max(difRows, difCols) - Math.min(difRows, difCols);
             return (gCost * 14) + (hCost * 10);
         }
         else {
             return Math.abs(difRows + difCols) * 10;
-        }*/
-
-         return Math.abs(difRows + difCols) * 10;
+        }
     }
 
     private boolean isDiagonal(int i, int j, int y, int x) {
@@ -373,19 +378,6 @@ public class Grid extends VBox implements Runnable, EstadoCeldas {
         }
 
         return resuelto;
-    }
-
-    private int BB(ArrayList<Celda> list, Celda node) {
-        int left = 0;
-        int right = list.size();
-        while (left < right) {
-            int middle = (left + right) / 2;
-            if (list.get(middle).Fcost >= node.Fcost)
-                right = middle;
-            else
-                left = middle + 1;
-        }
-        return left;
     }
 
     /**
