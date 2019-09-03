@@ -33,10 +33,8 @@ public class Grid extends VBox implements Runnable, EstadoCeldas {
     private Celda startNode, endNode;
     private boolean resuelto;
     private int pathNodes;
-    SortCeldas sort;
 
     public Grid() {
-        sort = new SortCeldas();
         propiedades = new Propiedades();
         this.gen = new GenerarLaberinto();
         genDFS = new MakeMazeDfs();
@@ -175,7 +173,6 @@ public class Grid extends VBox implements Runnable, EstadoCeldas {
 
         while (true) {
 
-            // current.closed = true;
             closedList.add(current);
 
             for (int i = current.getFila() - 1; i <= current.getFila() + 1 && !resuelto; i++) {
@@ -263,7 +260,6 @@ public class Grid extends VBox implements Runnable, EstadoCeldas {
         nodo.Fcost  = Hcost + Gcost;
         nodo.parent = parent;
 
-        // openList.add( nodo );
         openList.add( BB(openList, nodo), nodo );
     }
 
@@ -404,13 +400,4 @@ public class Grid extends VBox implements Runnable, EstadoCeldas {
         }
     }
 
-}
-
-class SortCeldas implements Comparator<Celda> {
-    @Override
-    public int compare(Celda o1, Celda o2) {
-        if (o1.Fcost == o2.Fcost)
-            return o1.Hcost - o2.Hcost;
-        return o1.Fcost - o2.Fcost;
-    }
 }
