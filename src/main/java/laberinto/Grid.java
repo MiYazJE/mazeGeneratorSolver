@@ -28,17 +28,19 @@ public class Grid extends VBox implements Runnable, EstadoCeldas {
     private MakeMazeDfs genDFS;
 
     // Needed for A * search
-    private ArrayList<Celda> parentList;
+    private ArrayList<Celda> openList;
+    private HashSet<Celda> closedList;
     private Celda startNode, endNode;
     private boolean resuelto;
-    private int nodosCerrados;
+    private int pathNodes;
+    SortCeldas sort;
 
     public Grid() {
+        sort = new SortCeldas();
         propiedades = new Propiedades();
         this.gen = new GenerarLaberinto();
         genDFS = new MakeMazeDfs();
         generarLaberinto();
-        parentList = new ArrayList<>();
     }
 
     /**
@@ -97,39 +99,50 @@ public class Grid extends VBox implements Runnable, EstadoCeldas {
                 iniciarAstar();
             }
             else if (conf.get("ALGORITMOBUSQUEDA").equals("DFS")) {
-                long inicio = System.nanoTime();
-                System.out.println("Iniciando algoritmo de busqueda DFS...");
-                if (resolverDfs(startNode.getFila(), startNode.getColumna())) {
-                    long fin = System.nanoTime();
-                    System.out.println("Resuelto en " + ((fin - inicio) / 1_000_000_000.0) + " segundos");
-                }
-                else {
-                    System.out.println("El laberinto no ha sido resuelto.");
-                }
+                iniciarDfs();
             }
         } else {
             // Cannot start exception, declare initial and final points.
-            Platform.runLater(() -> {
-                Mensaje.mostrarNotificacion(Interfaz.contenedorGlobal, 2);
-                System.out.println("ERROR. Cannot start exception, declare initial and final points.");
-            });
+            errorNoNodes();
         }
     }
 
     private void iniciarAstar() {
         System.out.println("Iniciando algoritmo de busqueda A star...");
-        parentList = new ArrayList<>();
+        openList = new ArrayList<>();
+        closedList = new HashSet<>();
         long inicio = System.nanoTime();
         if (resolverAStar(startNode)) {
             paintPath(endNode.parent);
             long fin = System.nanoTime();
             System.out.println("Resuelto en " + ((fin - inicio) / 1_000_000_000.0) + " segundos");
-            System.out.println("Nodos cerrados: " + nodosCerrados);
-            System.out.println("Nodos abiertos: " + parentList.size());
+            System.out.println("Nodos cerrados: " + closedList.size());
+            System.out.println("Nodos abiertos: " + openList.size());
+            System.out.println("Ruta: " + pathNodes);
         } else {
             System.out.println( "LABERINTO NO RESUELTO!" );
         }
 
+    }
+
+    private void iniciarDfs() {
+        long inicio = System.nanoTime();
+        System.out.println("Iniciando algoritmo de busqueda DFS...");
+        if (resolverDfs(startNode.getFila(), startNode.getColumna())) {
+            iniciarDfs();
+            long fin = System.nanoTime();
+            System.out.println("Resuelto en " + ((fin - inicio) / 1_000_000_000.0) + " segundos");
+        }
+        else {
+            System.out.println("El laberinto no ha sido resuelto.");
+        }
+    }
+
+    private void errorNoNodes() {
+        Platform.runLater(() -> {
+            Mensaje.mostrarNotificacion(Interfaz.contenedorGlobal, 2);
+            System.out.println("ERROR. Cannot start exception, declare initial and final points.");
+        });
     }
 
     private boolean buscarInicioyFinal() {
@@ -149,61 +162,45 @@ public class Grid extends VBox implements Runnable, EstadoCeldas {
         return end && inicio;
     }
 
-
-    private boolean fuera(int f, int c) {
-        return (f < 0 || c < 0 || f >= dimension || c >= dimension);
-    }
-
-    /**
-     * Comprueba si la celda es valida si su estado es:
-     *  - ABIERTO
-     *  - INICIO
-     *  - FINAL
-     * @param celda
-     * @return
-     */
-    private boolean isValid(Celda celda) {
-        return celda.isOpen() || celda.isStart() || celda.isEnd();
-    }
-
     private boolean resolverAStar(Celda current) {
 
         int tempHcost, tempFcost, tempGcost;
 
         while (true) {
 
-            current.closed = true;
+            // current.closed = true;
+            closedList.add(current);
 
             for (int i = current.getFila() - 1; i <= current.getFila() + 1 && !resuelto; i++) {
                 for (int j = current.getColumna() - 1; j <= current.getColumna() + 1 && !resuelto; j++) {
+
+                    // Si el nodo es el mismo que el padre o si es una pared, seguimos...
+                    if (fuera(i, j) || (current.equals(laberinto[i][j])) || laberinto[i][j].isWall()) continue;
 
                     // Evitar si el nodo se encuentra en cualquier diagonal
                     if (!conf.get("DIAGONALES").equals("SI"))
                         if (isDiagonal(i, j, current.getFila(), current.getColumna())) continue;
 
-                    // Si el nodo es el mismo que el padre o si es una pared, seguimos...
-                    if (fuera(i, j) || (current.equals(laberinto[i][j])) || laberinto[i][j].isWall()) continue;
-
                     if (conf.get("DIAGONALES").equals("SI"))
-                        if (i != current.getFila() && j != current.getColumna()) {
+                        if (i != current.getFila() && j != current.getColumna())
                             if (pathBlockedDiagonaly(i, j)) continue;
-                        }
 
-                    // Si en el nodo ya se han conocido todos sus vecinos los descartamos.
-                    if (laberinto[i][j].closed) continue;
+                    // Si en el nodo se encuentra en la lista cerrada continuamos
+                    if (closedList.contains(laberinto[i][j])) continue;
 
                     // El nodo final ya ha sido encontrado
                     if (laberinto[i][j].equals(endNode)) {
                         resuelto = true;
-                        System.out.println(parentList);
                         endNode.parent = laberinto[current.getFila()][current.getColumna()];
                     }
                     else {
 
+                        // Calculamos los supuestos nuevos costes
                         tempGcost = current.Gcost + calculateCost(current, laberinto[i][j]);
                         tempHcost = calculateCost(endNode, laberinto[i][j]);
                         tempFcost = tempHcost + tempGcost;
 
+                        // Si el nodo no tiene padre entonces los insertamos directamente
                         if (laberinto[i][j].parent == null) {
                             asignarCostes(laberinto[i][j], tempHcost, tempGcost, current);
                             if (dimension <= 11) {
@@ -211,9 +208,12 @@ public class Grid extends VBox implements Runnable, EstadoCeldas {
                             }
                         }
                         else {
-                            if (tempFcost < laberinto[i][j].Fcost) {
-                                parentList.remove(laberinto[i][j]);
+                            // Si el nodo ya tiene un padre comprobamos si los costes hasta esta nueva celda son mas bajos
+                            // si es asi asignamos como nuevo padre
+                            if (tempFcost < laberinto[i][j].Fcost && tempHcost <= laberinto[i][j].Fcost) {
                                 asignarCostes(laberinto[i][j], tempHcost, tempGcost, current);
+                                if (dimension <= 11)
+                                    laberinto[i][j].setInfo();
                             }
                         }
 
@@ -228,7 +228,7 @@ public class Grid extends VBox implements Runnable, EstadoCeldas {
                 }
             }
 
-            if (parentList.isEmpty() || resuelto) break;
+            if (openList.isEmpty() || resuelto) break;
             current = getLowestNode();
         }
 
@@ -236,40 +236,42 @@ public class Grid extends VBox implements Runnable, EstadoCeldas {
     }
 
     private void paintPath(Celda node) {
-        if (node.parent == null) return;
-
-        // System.out.println( node.getFila() + "-" + node.getColumna() );
-
-        paintPath(node.parent);
-
-        synchronized (this) {
-            try {
-                laberinto[node.getFila()][node.getColumna()].pintarCelda("VUELTA");
-                wait(40);
-            } catch (InterruptedException e) { }
+        pathNodes = 0;
+        while (node.parent != null) {
+            pathNodes++;
+            synchronized (this) {
+                try {
+                    laberinto[node.getFila()][node.getColumna()].pintarCelda("VUELTA");
+                    wait(10);
+                } catch (InterruptedException e) { }
+            }
+            node = node.parent;
         }
     }
 
     private void asignarCostes(Celda nodo, int Hcost, int Gcost, Celda parent) {
 
-        nodo.Gcost = Gcost;
-        nodo.Hcost = Hcost;
-        nodo.Fcost = Hcost + Gcost;
+        nodo.Gcost  = Gcost;
+        nodo.Hcost  = Hcost;
+        nodo.Fcost  = Hcost + Gcost;
         nodo.parent = parent;
 
-        if (!parentList.isEmpty() && nodo.Fcost <= parentList.get(0).Fcost && nodo.Hcost <= parentList.get(0).Hcost)
-            parentList.add(0, nodo);
+        if (!openList.isEmpty() && nodo.Fcost <= openList.get(0).Fcost)
+            openList.add(0, nodo);
+        else if (!openList.isEmpty() && nodo.Fcost >= openList.get(openList.size()-1).Fcost)
+            openList.add(nodo);
         else
-            parentList.add( BB(parentList, nodo), nodo );
+            openList.add( BB(openList, nodo), nodo );
     }
 
     // Devuelve el nodo con menos coste gracias a que la lista es previamente ordenada.
     private Celda getLowestNode() {
-        if (parentList.get(0) != null) {
-            parentList.get(0).pintarCelda("ACTUAL");
+        // openList.sort(sort);
+        Celda nodo = openList.remove(0);
+        if (nodo != null) {
+            nodo.pintarCelda("ACTUAL");
         }
-        this.nodosCerrados++;
-        return parentList.remove(0);
+        return nodo;
     }
 
     /**
@@ -283,9 +285,16 @@ public class Grid extends VBox implements Runnable, EstadoCeldas {
         int difRows = Math.abs(current.getFila() - target.getFila());
         int difCols = Math.abs(current.getColumna() - target.getColumna());
 
-        int gCost = Math.min(difRows, difCols);
-        int hCost = Math.max(difRows, difCols) - Math.min(difRows, difCols);
-        return (gCost * 14) + (hCost * 10);
+        /*if (conf.get("DIAGONALES").equals("SI")) {
+            int gCost = Math.min(difRows, difCols);
+            int hCost = Math.max(difRows, difCols) - Math.min(difRows, difCols);
+            return (gCost * 14) + (hCost * 10);
+        }
+        else {
+            return Math.abs(difRows + difCols) * 10;
+        }*/
+
+        return Math.abs(difRows + difCols) * 10;
     }
 
     private boolean isDiagonal(int i, int j, int y, int x) {
@@ -302,6 +311,22 @@ public class Grid extends VBox implements Runnable, EstadoCeldas {
                 (!fuera(i, j-1) && laberinto[i][j-1].isWall() && !fuera(i+1, j) && laberinto[i+1][j].isWall()) || // right upper
                 (!fuera(i-1, j) && laberinto[i-1][j].isWall() && !fuera(i, j+1) && laberinto[i][j+1].isWall()) || // left bottom
                 (!fuera(i-1, j) && laberinto[i-1][j].isWall() && !fuera(i, j-1) && laberinto[i][j-1].isWall());   // right bottom
+    }
+
+    private boolean fuera(int f, int c) {
+        return (f < 0 || c < 0 || f >= dimension || c >= dimension);
+    }
+
+    /**
+     * Comprueba si la celda es valida si su estado es:
+     *  - ABIERTO
+     *  - INICIO
+     *  - FINAL
+     * @param celda
+     * @return
+     */
+    private boolean isValid(Celda celda) {
+        return celda.isOpen() || celda.isStart() || celda.isEnd();
     }
 
     private boolean resolverDfs(int i, int j) {
@@ -346,7 +371,7 @@ public class Grid extends VBox implements Runnable, EstadoCeldas {
         int right = list.size();
         while (left < right) {
             int middle = (left + right) / 2;
-            if (list.get(middle).Fcost > node.Fcost && list.get(middle).Hcost > node.Hcost)
+            if (list.get(middle).Fcost > node.Fcost /*&& list.get(middle).Hcost > node.Hcost*/)
                 right = middle;
             else
                 left = middle + 1;
@@ -360,21 +385,12 @@ public class Grid extends VBox implements Runnable, EstadoCeldas {
     public void limpiarLaberinto() {
         for (int i = 0; i < dimension; i++)
             for (int j = 0; j < dimension; j++) {
-                if (!laberinto[i][j].isWall())
-                    laberinto[i][j].restart();
-                laberinto[i][j].restartLabel();
+                Celda node = laberinto[i][j];
+                if (!node.isWall() && !node.isEnd() && !node.isStart())
+                    laberinto[i][j].reset();
+                if (dimension <= 11)
+                    laberinto[i][j].restartLabel();
             }
-    }
-
-    /**
-     * Cambia el estado de todas las celdasa ABIERTO
-     */
-    public void crearTodoAbierto() {
-        for (int i = 0; i < dimension; i++) {
-            for (int j = 0; j < dimension; j++) {
-                laberinto[i][j].fullRestart();
-            }
-        }
     }
 
     private void cargarDimensiones() {

@@ -29,7 +29,6 @@ public class Celda extends StackPane implements EstadoCeldas {
     public int Gcost; // Coste de ir de esta celda a la celda inicio
     public int Hcost; // Coste de ir de esta celda a la celda final
     public int Fcost; // Suma de los costes G y H
-    public boolean closed; // Representa si los costes de esta celda ya estan calculados.
     private Label label;
 
     public Celda(int f, int c) {
@@ -127,7 +126,7 @@ public class Celda extends StackPane implements EstadoCeldas {
         });
         this.setOnMouseEntered(e -> {
             if (e.isShiftDown()) {
-                this.fullRestart();
+                this.reset();
             }
             if (e.isAltDown()) {
                 this.setPared();
@@ -194,15 +193,12 @@ public class Celda extends StackPane implements EstadoCeldas {
         return this.valor == PARED;
     }
 
-    public void restart() {
-        if (this.valor != PARED) {
-            setAbierto();
-            this.Gcost = 0;
-            this.Hcost = 0;
-            this.Fcost = 0;
-            this.closed = false;
-            this.parent = null;
-        }
+    public void reset() {
+        setAbierto();
+        this.Gcost = 0;
+        this.Hcost = 0;
+        this.Fcost = 0;
+        this.parent = null;
     }
 
     public void restartLabel() {
@@ -215,15 +211,6 @@ public class Celda extends StackPane implements EstadoCeldas {
             this.label.setText("Gcost: " + this.Gcost + "\nHcost: " + this.Hcost + "\nFcost: " + this.Fcost);
             this.getChildren().add(label);
         });
-    }
-
-    public void fullRestart() {
-        setAbierto();
-        this.Gcost = 0;
-        this.Hcost = 0;
-        this.Fcost = 0;
-        this.closed = false;
-        this.parent = null;
     }
 
     public int getValor() {
