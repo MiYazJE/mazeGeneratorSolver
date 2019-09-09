@@ -42,9 +42,9 @@ public class Grid extends VBox implements Runnable, EstadoCeldas {
     }
 
     /**
-     * MÈtodo que crea un laberinto c muestra un laberinto de la siguiente forma:
-     * 1.- Cre·mos un componente HBOX.
-     * 2.- Cre·mos una Celda c la introducimos en el HBOX.
+     * M√©todo que crea un laberinto c muestra un laberinto de la siguiente forma:
+     * 1.- Cre√°mos un componente HBOX.
+     * 2.- Cre√°mos una Celda c la introducimos en el HBOX.
      * 3.- Introducimos dentro de el objeto VBOX que estamos heredando el HBOX
      * con todas las celdas de una fila de la matriz.
      * 4.- Repetimos este proceso hasta que no queden mas filas por recorrer.
@@ -134,7 +134,6 @@ public class Grid extends VBox implements Runnable, EstadoCeldas {
         long inicio = System.nanoTime();
         System.out.println("Iniciando algoritmo de busqueda DFS...");
         if (resolverDfs(startNode.getFila(), startNode.getColumna())) {
-            iniciarDfs();
             long fin = System.nanoTime();
             System.out.println("Resuelto en " + ((fin - inicio) / 1_000_000_000.0) + " segundos");
         }
